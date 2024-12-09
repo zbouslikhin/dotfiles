@@ -4,3 +4,4 @@
 - home-manager switch --flake .#zaidb-ws
 - nix-channel --update
 - nix-env -iA nixpkgs.home-manager
+- home-manager switch --flake .#zaidb-wsl
