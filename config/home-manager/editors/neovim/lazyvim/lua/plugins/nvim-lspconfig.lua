@@ -24,9 +24,6 @@ return {
         "ruff",
         "basedpyright",
 
-        -- YAML
-        "yamlls",
-
         -- TypeScript
         "ts_ls",
 
@@ -35,11 +32,6 @@ return {
         "docker_compose_language_service",
       },
       handlers = {
-        function(server_name)
-          require("lspconfig")[server_name].setup({
-            capabilities = capabilities,
-          })
-        end,
         ["ruff"] = function()
           require("lspconfig").ruff.setup({
             capabilities = capabilities,
@@ -78,35 +70,6 @@ return {
                     "before_each",
                     "after_each",
                   },
-                },
-              },
-            },
-          })
-        end,
-        ["yamlls"] = function()
-          require("lspconfig").yamlls.setup({
-            capabilities = capabilities,
-            settings = {
-              yaml = {
-                customTags = {
-                  "!Base64",
-                  "!Cidr",
-                  "!FindInMap sequence",
-                  "!GetAtt",
-                  "!GetAZs",
-                  "!ImportValue",
-                  "!Join sequence",
-                  "!Ref",
-                  "!Select sequence",
-                  "!Split sequence",
-                  "!Sub sequence",
-                  "!Sub",
-                  "!And sequence",
-                  "!Condition",
-                  "!Equals sequence",
-                  "!If sequence",
-                  "!Not sequence",
-                  "!Or sequence",
                 },
               },
             },
