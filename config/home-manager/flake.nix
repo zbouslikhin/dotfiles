@@ -9,18 +9,32 @@
 
   outputs = { self, nixpkgs, home-manager, mac-app-util, ... }: let
     username = "zaidb";
-    root = "home";
+    root = "Users";
 
 in {
     homeConfigurations = {
       # # macOS configuration
-      # zaidb-macos = home-manager.lib.homeManagerConfiguration {
-      #   modules = [
-      #     ./macos/flake.nix
-      #   ];
-      #   pkgs = import nixpkgs { system = "aarch64-darwin"; config.allowUnfree = true; };
-      #   username = username;
-      # };
+      zaidb-macos = home-manager.lib.homeManagerConfiguration {
+                pkgs = import nixpkgs { system = "aarch64-darwin"; config.allowUnfree = true; };
+        modules = [
+          ({ pkgs, lib, ... }: {
+            home = {
+              username = username;
+              homeDirectory = "/${root}/${username}";
+              stateVersion = "24.11";
+            };
+
+            imports = [
+              ./editors
+              ./shell
+              ./programming
+              ./fonts
+              ./terminals
+              ./apps
+            ];
+          })
+        ];       
+      };
 
       # WSL configuration
       # TODO: move to separate file once relative paths work
@@ -61,4 +75,5 @@ fi
     };
   };
 }
+
 
