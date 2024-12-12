@@ -34,7 +34,7 @@ in {
               homeDirectory = "/${root}/${username}";
               stateVersion = "24.11";
               activation = {
-                makePotato = lib.hm.dag.entryAfter ["writeBoundary"] ''
+                copyWinSshKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
 #!/bin/bash
 SCRIPT="/${root}/${username}/.config/home-manager/copy_ssh.sh"
 if [ -f "$SCRIPT" ]; then
