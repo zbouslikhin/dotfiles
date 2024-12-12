@@ -1,6 +1,7 @@
 #!/bin/bash
 
-SOURCE="/mnt/c/Users/zaid/.ssh"
+WINDOWS_USER=$(/mnt/c/Windows/System32/cmd.exe "/c" "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+SOURCE="/mnt/c/Users/${WINDOWS_USER}/.ssh"
 DEST="$HOME/.ssh"
 
 if [ -d "$SOURCE" ]; then
@@ -14,5 +15,7 @@ if [ -d "$SOURCE" ]; then
 
   echo "Contents of $SOURCE copied to $DEST"
 else
+  echo "HIII"
+  echo $WINDOWS_USER
   echo "Folder $SOURCE does not exist. Nothing to copy."
 fi

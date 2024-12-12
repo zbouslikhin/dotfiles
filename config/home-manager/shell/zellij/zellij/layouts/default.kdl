@@ -160,7 +160,7 @@ layout {
 
                 datetime        "#[fg=$fg] {format} "
                 datetime_format "%Y-%m-%d %H:%M"
-                datetime_timezone "Europe/Helsinki"
+                datetime_timezone "Europe/Amsterdam"
             }
         }
         children

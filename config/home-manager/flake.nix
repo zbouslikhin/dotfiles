@@ -43,11 +43,11 @@ in {
               activation = {
                 makePotato = lib.hm.dag.entryAfter ["writeBoundary"] ''
 #!/bin/bash
-SCRIPT="${root}/${username}/copy_ssh.ssh"
-if [ -d "$SCRIPT" ]; then
+SCRIPT="/${root}/${username}/.config/home-manager/copy_ssh.sh"
+if [ -f "$SCRIPT" ]; then
   source $SCRIPT
 else
-  echo "Folder $SCRIPT does not exist. Nothing to copy."
+  echo "$SCRIPT does not exist"
 fi
                 '';
               };
