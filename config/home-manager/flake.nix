@@ -1,5 +1,5 @@
 {
-  description = "My Home Manager configuration for macOS and WSL";
+  description = "Zaid Home Manager configuration for macOS and WSL using flakes";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -12,9 +12,6 @@
     root = "home";
 
 in {
-    devShells.default = nixpkgs.mkShell {
-      buildInputs = []; # Add dependencies here if needed
-    };
     homeConfigurations = {
       # # macOS configuration
       # zaidb-macos = home-manager.lib.homeManagerConfiguration {
