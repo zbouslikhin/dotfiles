@@ -1,0 +1,67 @@
+lint.select = [
+    "E",
+    "F",
+    "YTT",
+    "W",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "A",
+    "C4",
+    "A",
+    "T10",
+    "T20",
+    "PYI",
+    "RET",
+    "SIM",
+    "DJ",
+    "PT",
+    "TCH",
+    "ERA",
+    "TRY",
+    "PERF",
+    "SIM",
+    "RUF",
+    "NPY",
+    "ASYNC",
+    "COM",
+    "PIE",
+    "FA",
+    "ISC",
+    "ICN",
+    "Q",
+    "RSE",
+    "TID",
+    "ARG",
+    "FLY",
+    "DTZ"
+]
+
+lint.ignore = [
+    "ASYNC110",
+    "ICN001",
+    "RUF006",
+    "PT004",
+    "B905",
+    "SIM105",
+    "N817",
+    "COM812", # Handled by black
+    "TRY003",
+    "TRY400",
+    "TRY301",
+]
+
+target-version = "py311"
+
+[lint.flake8-pytest-style]
+fixture-parentheses = true
+mark-parentheses = true
+# To enable in the future:
+# DTZ Datatime and timezone improvements
+# C90 Code complexity
+# ANN Force type annotations
+# S flake8 bandit
+# PL Plint (quite strict)
+# FBT Boolean trap
+# PTH Pathlib for file operations
