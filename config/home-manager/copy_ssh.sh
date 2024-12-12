@@ -7,6 +7,11 @@ DEST="$HOME/.ssh"
 if [ -d "$SOURCE" ]; then
   echo "Found folder: $SOURCE"
 
+  if [ -d "$DEST" ]; then
+    echo "Directory $DEST exists. Deleting..."
+    rm -rf "$DEST"
+  fi
+
   mkdir -p "$DEST"
 
   cp -r "$SOURCE"/* "$DEST"
@@ -15,7 +20,5 @@ if [ -d "$SOURCE" ]; then
 
   echo "Contents of $SOURCE copied to $DEST"
 else
-  echo "HIII"
-  echo $WINDOWS_USER
   echo "Folder $SOURCE does not exist. Nothing to copy."
 fi
