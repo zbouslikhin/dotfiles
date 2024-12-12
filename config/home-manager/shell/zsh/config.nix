@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, username, ... }:
 
 {
     home.packages = [
@@ -24,7 +24,7 @@
         };
 
         shellAliases = {
-            hm-build = "home-manager switch";
+            hm-build = "source /home/zaidb/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
             hm-clean = "nix-collect-garbage --delete-old";
             ls = "exa --long --header --icons";
             lsa = "ls --all";

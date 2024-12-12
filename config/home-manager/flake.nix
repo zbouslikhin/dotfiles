@@ -9,6 +9,7 @@
 
   outputs = { self, nixpkgs, home-manager, mac-app-util, ... }: let
     username = "zaidb";
+    root = "home";
 
 in {
     devShells.default = nixpkgs.mkShell {
@@ -37,33 +38,17 @@ in {
           ({ pkgs, lib, ... }: {
             home = {
               username = username;
-              homeDirectory = "/home/${username}";
+              homeDirectory = "/${root}/${username}";
               stateVersion = "24.11";
               activation = {
                 makePotato = lib.hm.dag.entryAfter ["writeBoundary"] ''
-                  #!/bin/bash
-
-# Define source and destination paths
-SOURCE="/mnt/c/Users/zaid/.ssh"
-DEST="$HOME/.ssh"
-
-# Check if the source folder exists
-if [ -d "$SOURCE" ]; then
-  echo "Found folder: $SOURCE"
-
-  # Create the destination directory if it doesn't exist
-  mkdir -p "$DEST"
-  
-  # Copy the folder
-  cp -r "$SOURCE"/* "$DEST"
-  chmod -R 700 "$DEST"/*
-        echo "Set permissions to 600 for all keys in $DEST"
-  
-  echo "Contents of $SOURCE copied to $DEST"
+#!/bin/bash
+SCRIPT="${root}/${username}/copy_ssh.ssh"
+if [ -d "$SCRIPT" ]; then
+  source $SCRIPT
 else
-  echo "Folder $SOURCE does not exist. Nothing to copy."
+  echo "Folder $SCRIPT does not exist. Nothing to copy."
 fi
-
                 '';
               };
             };
