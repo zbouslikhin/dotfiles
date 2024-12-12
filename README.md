@@ -85,3 +85,9 @@ Set Zsh as your default shell:
 chsh -s /home/zaidb/.nix-profile/bin/zsh
 ```
 
+## Step 13: Install Python
+```bash
+asdf plugin-add python
+asdf install python latest
+asdf global python latest
+```
