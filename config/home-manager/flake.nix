@@ -14,10 +14,6 @@
 in {
     devShells.default = nixpkgs.mkShell {
       buildInputs = []; # Add dependencies here if needed
-      shellHook = ''
-         export MY_ENV_VAR="Hello world Z"
-         echo "Environment variable MY_ENV_VAR is set to: $MY_ENV_VAR"
-      '';
     };
     homeConfigurations = {
       # # macOS configuration
