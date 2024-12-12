@@ -1,7 +1,15 @@
 # For WSL
-- in home, `git clone git@github.com:zbouslikhin/dotfiles.git`
-- ln -s /home/zaidb/dotfiles/config/home-manager home-manager/ 
-- home-manager switch --flake .#zaidb-ws
-- nix-channel --update
-- nix-env -iA nixpkgs.home-manager
-- home-manager switch --flake .#zaidb-wsl
+- Update WSL: wsl --update
+- Install Ubuntu: wsl --install
+- Install Nix: sh <(curl -L https://nixos.org/nix/install) --daemon
+- Test Nix: nix-shell -p nix-info --run "nix-info -m"
+- Copy SSH from Windows: cp -R /mnt/c/Users/zbous/.ssh/ ~/.ssh
+- cd to home: cd
+- Git clone dotfiles: git clone git@github.com:zbouslikhin/dotfiles.git
+- Copy dotfiles: cp -R dotfiles/config/ ~/.config
+- Symlink repo to WSL config: cp -R /home/zaidb/dotfiles/config/home-manager ~/.config/home-manager
+- Symlink repo to WSL config: cp -R /home/zaidb/dotfiles/config/nix ~/.config/ni
+- Update Nix channels: nix-channel --update
+- Install home-manager: nix-env -iA nixpkgs.home-manager
+- Activate home-manager as flake: home-manager switch --flake ~/.config/home-manager#zaidb-wsl
+- Set Zsh as default shell: chsh -s /home/zaidb/.nix-profile/bin/zsh
