@@ -11,5 +11,6 @@
         ./wget/config.nix
         ./tree/config.nix
         ./npkill/config.nix
+        ./unzip/config.nix
     ];
 }
