@@ -1,13 +1,13 @@
 { config, pkgs, lib, ... }:
 
-let
-  isNotWSL = !builtins.hasAttr "WSL_DISTRO_NAME" (builtins.getEnv "WSL_DISTRO_NAME");
-in
+# let
+#   isNotWSL = !builtins.hasAttr "WSL_DISTRO_NAME" (builtins.getEnv "WSL_DISTRO_NAME");
+# in
 {
-  home.packages = lib.mkIf isNotWSL [
-    pkgs.spotify
+  home.packages = [
+    # pkgs.spotify
     pkgs.arc-browser
-    pkgs.brave
+    # pkgs.brave
     pkgs.wireguard-ui
   ];
 }
