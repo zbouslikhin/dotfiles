@@ -80,8 +80,8 @@ home-manager switch --flake ~/.config/home-manager#zaidb-wsl
 ```
 
 ## Step 12: Set Zsh as Default Shell
-Add Zsh installed by Nix to `sudo vim /etc/shells`
-```bash
+Add the following line to `sudo vim /etc/shells`
+```sh
 /home/zaidb/.nix-profile/bin/zsh
 ```
 Then set Zsh as your default shell:
