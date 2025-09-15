@@ -1,19 +1,18 @@
 { config, pkgs, ... }:
 
 {
-    programs.vscode = {
-        enable = true;
-        enableUpdateCheck = false;
-        enableExtensionUpdateCheck = false;
-        mutableExtensionsDir = false;
-        extensions = with pkgs.vscode-extensions; [
-          rust-lang.rust-analyzer
-          yzhang.markdown-all-in-one
-          jock.svg
-        ];
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (pkgs.lib.getName pkg) [ "vscode" ];
 
-        userSettings = {
-            "editor.fontSize" = 10;
-        };
+  programs.vscode = {
+    enable = true;
+    enableUpdateCheck = false;
+    enableExtensionUpdateCheck = false;
+    mutableExtensionsDir = true;
+
+    userSettings = {
+      "editor.fontSize" = 10;
     };
+  };
 }
+

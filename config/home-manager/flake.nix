@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     mac-app-util.url = "github:hraban/mac-app-util";
   };
 
@@ -15,13 +16,16 @@ in {
     homeConfigurations = {
       # # macOS configuration
       zaidb-macos = home-manager.lib.homeManagerConfiguration {
-                pkgs = import nixpkgs { system = "aarch64-darwin"; config.allowUnfree = true; };
+        pkgs = import nixpkgs {
+          system = "aarch64-darwin"; 
+          config.allowUnfree = true; 
+        };
         modules = [
           ({ pkgs, lib, ... }: {
             home = {
               username = username;
               homeDirectory = "/${root}/${username}";
-              stateVersion = "24.11";
+              stateVersion = "25.11";
             };
 
             imports = [

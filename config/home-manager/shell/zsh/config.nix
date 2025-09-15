@@ -14,6 +14,14 @@
 
         initExtra = ''
           source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+          function y() {
+              local tmp="$(mktemp -t yazi-cwd.XXXXXX)" cwd
+              yazi "$@" --cwd-file="$tmp"
+              IFS= read -r -d $'\0' cwd < "$tmp"
+              [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+              rm -f -- "$tmp"
+            }
         '';
 
         oh-my-zsh = {
@@ -24,8 +32,9 @@
         };
 
         shellAliases = {
-            hm-build = "source /home/zaidb/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
+            hm-build = "source /Users/zaidb/Documents/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
             hm-clean = "nix-collect-garbage --delete-old";
+            flake-update = "nix flake update";
             ls = "exa --long --header --icons";
             lsa = "ls --all";
             ff = "fzf";

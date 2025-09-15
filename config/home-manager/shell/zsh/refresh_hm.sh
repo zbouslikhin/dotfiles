@@ -29,6 +29,7 @@ cp -R "$SOURCE" "$DEST" || {
 
 echo -e "${BLUE}Applying new home-manager configuration...${RESET}"
 echo ""
+
 home-manager switch --flake "$DEST#zaidb-macos" || {
   echo -e "${RED}Home-manager switch failed. Check the output above for details.${RESET}"
 }
