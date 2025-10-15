@@ -8,7 +8,7 @@ RESET='\033[0m'
 echo ""
 echo -e "${BLUE}Refreshing home-manager configuration...${RESET}"
 
-SOURCE="/Users/zaidb/Documents/dotfiles/config/home-manager"
+SOURCE="/home/zaidb/Documents/dotfiles/config/home-manager"
 DEST="$HOME/.config/home-manager"
 
 if [ ! -d "$SOURCE" ]; then

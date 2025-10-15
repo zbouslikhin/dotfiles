@@ -32,7 +32,7 @@
         };
 
         shellAliases = {
-            hm-build = "source /Users/zaidb/Documents/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
+            hm-build = "source /home/zaidb/Documents/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
             hm-clean = "nix-collect-garbage --delete-old";
             flake-update = "nix flake update";
             ls = "exa --long --header --icons";

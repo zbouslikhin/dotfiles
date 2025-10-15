@@ -10,7 +10,7 @@
 
   outputs = { self, nixpkgs, home-manager, mac-app-util, ... }: let
     username = "zaidb";
-    root = "Users";
+    root = "home";
 
 in {
     homeConfigurations = {

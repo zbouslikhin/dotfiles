@@ -1,5 +1,14 @@
 # WSL Setup Guide
 
+---
+
+# TODO:
+1. Get automatically username and /home or /Users
+2. Do not install GUI apps if WSL
+3. Add gcc compiler
+
+---
+
 ## Step 1: Update WSL
 ```bash
 wsl --update
