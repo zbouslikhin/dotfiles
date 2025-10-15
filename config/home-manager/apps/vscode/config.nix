@@ -1,11 +1,10 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Detect WSL by checking for the WSL_DISTRO_NAME environment variable.
-  isWSL = builtins.getEnv "WSL_DISTRO_NAME" != "";
+  isWSL = builtins.match ".*[Mm]icrosoft.*" (builtins.readFile "/proc/version") != null;
 in
+builtins.trace ("isWSL = " + (if isWSL then "true" else "false")) (
 {
-  config = lib.mkIf (!isWSL) {
     nixpkgs.config.allowUnfreePredicate = pkg:
       builtins.elem (pkgs.lib.getName pkg) [ "vscode" ];
 
@@ -19,5 +18,5 @@ in
         "editor.fontSize" = 10;
       };
     };
-  };
-}
+  }
+)

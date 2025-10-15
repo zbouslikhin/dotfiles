@@ -6,26 +6,27 @@ local is_wsl = vim.fn.has("wsl") == 1
   or os.getenv("WSL_INTEROP") ~= nil
 -- local is_mac = vim.fn.has("macunix") == 1
 -- local is_linux = not is_wsl and not is_mac
-vim.api.nvim_create_user_command("CheckWSL", function()
-  vim.notify(vim.loop.os_uname().version, vim.log.levels.INFO, { title = "WSL Detection" })
-end, {})
 
 -- WSL Clipboard support
 if is_wsl then
-    vim.api.nvim_echo({{"[WSL Clipboard] Loaded", "MoreMsg"}}, false, {})
-  -- This is NeoVim's recommended way to solve clipboard sharing if you use WSL
-  -- See: https://github.com/neovim/neovim/wiki/FAQ#how-to-use-the-windows-clipboard-from-wsl
-  vim.g.clipboard = {
-    name = "wsl-clip",
-    copy = {
-      ["+"] = "clip.exe",
-      ["*"] = "clip.exe",
-    },
-    paste = {
-      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-    },
-    cache_enabled = 0,
-  }
-vim.opt.clipboard:append("unnamedplus")
+    if vim.fn.executable("wl-copy") == 0 then
+        print("wl-clipboard not found, clipboard integration won't work")
+    else
+        vim.g.clipboard = {
+            name = "wl-clipboard (wsl)",
+            copy = {
+                ["+"] = 'wl-copy --foreground --type text/plain',
+                ["*"] = 'wl-copy --foreground --primary --type text/plain',
+            },
+            paste = {
+                ["+"] = (function()
+                    return vim.fn.systemlist('wl-paste --no-newline|sed -e "s/\r$//"', {''}, 1) -- '1' keeps empty lines
+                end),
+                ["*"] = (function() 
+                    return vim.fn.systemlist('wl-paste --primary --no-newline|sed -e "s/\r$//"', {''}, 1)
+                end),
+            },
+            cache_enabled = true
+        }
+    end
 end

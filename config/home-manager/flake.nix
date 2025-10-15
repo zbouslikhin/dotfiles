@@ -70,7 +70,6 @@ fi
               ./programming
               ./fonts
               ./terminals
-              # ./apps
             ];
             
           })

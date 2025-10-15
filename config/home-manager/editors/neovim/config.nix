@@ -1,9 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
     home.packages = [
-      pkgs.lazygit
+        pkgs.lazygit
     ];
+    
 
     programs = {
         neovim = {
