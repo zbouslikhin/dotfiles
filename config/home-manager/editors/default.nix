@@ -1,5 +1,6 @@
 {
-    imports = [
-        ./neovim/config.nix
-    ];
+  imports = [
+    ./formatters/config.nix
+    ./neovim/config.nix
+  ];
 }

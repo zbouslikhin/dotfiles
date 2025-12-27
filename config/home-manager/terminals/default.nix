@@ -1,6 +1,6 @@
 {
-    imports = [
-        ./alacritty/config.nix
-        ./yazi/config.nix
-    ];
+  imports = [
+    ./alacritty
+    ./yazi/config.nix
+  ];
 }

@@ -1,5 +1,5 @@
 return {
-  'stevearc/conform.nvim',
+  "stevearc/conform.nvim",
   opts = {
     formatters_by_ft = {
       css = { "prettier" },
@@ -15,6 +15,7 @@ return {
       typescript = { "prettier" },
       typescriptreact = { "prettier" },
       ["python"] = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+      nix = { "nixfmt" },
     },
     notify_on_error = true,
   },

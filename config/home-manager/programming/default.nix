@@ -1,6 +1,7 @@
 {
-    imports = [
-        ./asdf/config.nix
-        ./gcc/config.nix
-    ];
+  imports = [
+    ./asdf/config.nix
+    ./gcc/config.nix
+    ./libssl/config.nix
+  ];
 }

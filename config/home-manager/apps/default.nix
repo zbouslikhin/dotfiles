@@ -1,6 +1,7 @@
 {
-    imports = [
-        ./vscode/config.nix
-        ./config.nix
-    ];
+  imports = [
+    # ./vscode/config.nix
+    # ./config-darwin.nix
+    ./config-linux.nix
+  ];
 }

@@ -1,6 +1,5 @@
-
 {
-    programs.carapace = {
-        enable = true;
-    };
+  programs.carapace = {
+    enable = true;
+  };
 }

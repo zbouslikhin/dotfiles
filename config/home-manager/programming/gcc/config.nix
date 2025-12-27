@@ -1,8 +1,8 @@
 { config, pkgs, ... }:
 
 {
-    home.packages = [
-        pkgs.clang
-    ];
+  home.packages = [
+    pkgs.clang
+  ];
 
 }

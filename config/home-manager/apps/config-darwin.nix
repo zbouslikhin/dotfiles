@@ -1,14 +1,17 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
-let
-  isWSL = builtins.getEnv "WSL_DISTRO_NAME" != "";
-in
-lib.mkIf (!isWSL) {
+lib.mkIf (config.home.sessionVariables.activeOS == "darwin") {
   nixpkgs.config.permittedInsecurePackages = [
     "arc-browser-1.106.0-66192"
   ];
 
-  nixpkgs.config.allowUnfreePredicate = pkg:
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
     builtins.elem (pkgs.lib.getName pkg) [
       "spotify"
       "arc-browser"

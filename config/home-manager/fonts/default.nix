@@ -1,9 +1,10 @@
 { config, pkgs, ... }:
 
 {
-    home.packages = with pkgs; [
-       nerd-fonts.hack
-    ];
+  home.packages = with pkgs; [
+    nerd-fonts.hack
+  ];
 
-    fonts.fontconfig.enable = true;    
+  fonts.fontconfig.enable = true;
 }
+

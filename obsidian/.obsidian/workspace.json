@@ -1,0 +1,236 @@
+{
+  "main": {
+    "id": "5d91e20cf547934d",
+    "type": "split",
+    "children": [
+      {
+        "id": "daec5a81067bc5a3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f93a453488bbc860",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "042740776c708334",
+    "type": "split",
+    "children": [
+      {
+        "id": "b01e6ec84b69d108",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d37e3465bd1ea339",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "c9baf362e04cb8ba",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f935a0ece82ebb14",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "33e192713613341c",
+    "type": "split",
+    "children": [
+      {
+        "id": "a59c4855d1f70721",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "96f84d11b57f8dbb",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Welcome.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Welcome"
+            }
+          },
+          {
+            "id": "8c93752ddb60761a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Welcome.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Welcome"
+            }
+          },
+          {
+            "id": "1873439d58bfef7d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "bfc70b51dc619986",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "31e33ff26fb1aa25",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Welcome.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Welcome"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "obsidian-livesync:P2P Replicator": false,
+      "obsidian-livesync:Show Log": false,
+      "obsidian-livesync:Replicate": false,
+      "templater-obsidian:Templater": false,
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-livesync:Show Customization sync": false
+    }
+  },
+  "active": "f93a453488bbc860",
+  "lastOpenFiles": [
+    "08. language learning/Polish, vocabulary.md",
+    "99. extras/template/template, add ai chat.md",
+    "08. language learning/Spanish, vocabulary.md",
+    "08. language learning/Language learning index.md",
+    "08. language learning/Dutch, materials.md",
+    "07. food/Recipes.md",
+    "02. engineering/tools.md",
+    "02. engineering/experiments.md",
+    "02. engineering/data science.md",
+    "02. engineering/control Theory.md",
+    "99. copy-paste.md",
+    "99. extras/helpers.md",
+    "12. paperwork/Pins.md",
+    "10. Coding/project.md",
+    "10. Coding/copy-paste.md",
+    "09. Work/Qlayers, Digital Twin.md",
+    "09. Work/Qlayers, hetronic.md",
+    "09. Work/Qlayers, uv python.md",
+    "09. Work/Qlayers, tia portal openness.md",
+    "09. Work/Qlayers, Setup GitLab runner.md",
+    "09. Work/Qlayers, Notes.md",
+    "06. build, diy, tinkering, hobbies/Saxophone.md",
+    "06. build, diy, tinkering, hobbies/3D printing.md",
+    "06. build, diy, tinkering, hobbies/Builds, Bike holder.md",
+    "06. build, diy, tinkering, hobbies/Builds, L hanging cabinet.md",
+    "06. build, diy, tinkering, hobbies/Builds, Shopping list.md",
+    "99. extras/images/hgnjfpfubglucfegeetl.mp4",
+    "99. extras/images/IMG_8076.jpeg",
+    "99. extras/images/Pasted image 20251129003036.png",
+    "99. extras/images/Pasted image 20251115202725.png",
+    "99. extras/images/pasted image 20251104223756.png",
+    "99. extras/images/pasted image 20251104223807.png",
+    "99. extras/images/pasted image 20251026235656.png",
+    "99. extras/images/Pasted image 20251018225659.png",
+    "hello 1.zip",
+    "99. extras/images/image 1.jpg",
+    "99. extras/images/image.jpg",
+    "99. extras/images/Pasted image 20251216135606.png",
+    "99. extras/files/1-la voix du sax. vol.1.pdf",
+    "99. extras/files",
+    "12. paperwork/Flights/11_12_2025_Eindhoven-Oujda.pdf",
+    "99. extras/template",
+    "12. paperwork/Flights",
+    "99. extras/images",
+    "12. paperwork/Passports/Passport_ZaidBouslikhin.pdf",
+    "12. paperwork/Residence permits/ResidencePermit_ZaidBouslikhin.pdf"
+  ]
+}
