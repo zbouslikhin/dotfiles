@@ -13,5 +13,6 @@ lib.mkIf (config.home.sessionVariables.activeOS == "linux") {
     google-chrome
     wireguard-ui
     obsidian
+    anydesk
   ];
 }
