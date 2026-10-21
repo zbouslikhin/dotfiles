@@ -86,6 +86,7 @@
                   ./shell
                   ./programming
                   ./fonts
+                  ./terminals/yazi/config.nix
                 ];
 
               }
