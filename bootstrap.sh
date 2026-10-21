@@ -8,9 +8,14 @@
 #   DOTFILES_DIR     where the repo is cloned             (default: ~/dotfiles)
 #   DOTFILES_HOST    macos | wsl | ubuntu                 (default: detected)
 #   DOTFILES_BRANCH  branch for the first clone           (default: main)
+#   DOTFILES_REPO    URL to clone from                    (default: GitHub over HTTPS)
 set -eu
+# home-manager and nh need $USER, which some shells (docker exec, cron) leave unset.
+USER="${USER:-$(id -un)}"
+export USER
 
 REPO_HTTPS="https://github.com/zbouslikhin/dotfiles.git"
+DOTFILES_REPO="${DOTFILES_REPO:-$REPO_HTTPS}"
 REPO_SSH="git@github.com:zbouslikhin/dotfiles.git"
 
 info() { printf '\033[0;34m==> %s\033[0m\n' "$*"; }
@@ -21,9 +26,12 @@ die() {
 }
 
 # Under `curl | sh` stdin is the script, so prompts read from the terminal.
+# /dev/tty exists even without one, so check it can actually be opened.
+has_tty() { (: </dev/tty) 2>/dev/null; }
+
 ask() {
   # ask <prompt> <default>
-  if [ -r /dev/tty ] && [ -w /dev/tty ]; then
+  if has_tty; then
     printf '%s [%s]: ' "$1" "$2" >/dev/tty
     read -r reply </dev/tty || reply=""
     printf '%s' "${reply:-$2}"
@@ -36,7 +44,9 @@ ask() {
 case "$(uname -s)" in
 Darwin) detected_host=macos ;;
 Linux)
-  if [ -n "${WSL_DISTRO_NAME:-}" ] || grep -qi microsoft /proc/version 2>/dev/null; then
+  # Not /proc/version: containers on Docker Desktop share the WSL2 kernel.
+  if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ] ||
+    [ -e /proc/sys/fs/binfmt_misc/WSLInterop-late ]; then
     detected_host=wsl
   else
     detected_host=ubuntu
@@ -69,7 +79,7 @@ esac
 [ "$DOTFILES_USER" = "$(id -un)" ] ||
   warn "DOTFILES_USER ($DOTFILES_USER) is not the current user ($(id -un)); the switch will likely fail."
 
-info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR ($DOTFILES_BRANCH)"
+info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR"
 
 # --- 2. Install Nix if missing -------------------------------------------------
 load_nix() {
@@ -130,11 +140,11 @@ if [ -d "$DOTFILES_DIR/.git" ]; then
   fi
 else
   [ -e "$DOTFILES_DIR" ] && die "$DOTFILES_DIR exists but is not a git repo."
-  info "Cloning $REPO_HTTPS to $DOTFILES_DIR"
-  git clone --branch "$DOTFILES_BRANCH" "$REPO_HTTPS" "$DOTFILES_DIR"
+  info "Cloning $DOTFILES_REPO ($DOTFILES_BRANCH) to $DOTFILES_DIR"
+  git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
 # Push over SSH once a key is available.
-if ls "$HOME"/.ssh/id_* >/dev/null 2>&1; then
+if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && ls "$HOME"/.ssh/id_* >/dev/null 2>&1; then
   git -C "$DOTFILES_DIR" remote set-url origin "$REPO_SSH"
 fi
 
@@ -174,7 +184,12 @@ else
 fi
 if [ "$current_shell" != "$zsh_path" ]; then
   info "Changing login shell to $zsh_path"
-  chsh -s "$zsh_path" </dev/tty || warn "chsh failed; run: chsh -s $zsh_path"
+  # chsh asks for the password on stdin, which is the script under `curl | sh`.
+  if has_tty; then
+    chsh -s "$zsh_path" </dev/tty || warn "chsh failed; run: chsh -s $zsh_path"
+  else
+    chsh -s "$zsh_path" || warn "chsh failed; run: chsh -s $zsh_path"
+  fi
 fi
 
 info "Done. Open a new terminal. Update later with: nh home switch"
