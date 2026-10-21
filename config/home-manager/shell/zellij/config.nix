@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  hmDir,
   ...
 }:
 
@@ -19,7 +20,7 @@
 
   xdg.configFile = {
     zellij = {
-      source = config.lib.file.mkOutOfStoreSymlink "${builtins.toString ./.}/zellij";
+      source = config.lib.file.mkOutOfStoreSymlink "${hmDir}/shell/zellij/zellij";
       recursive = true;
     };
   };

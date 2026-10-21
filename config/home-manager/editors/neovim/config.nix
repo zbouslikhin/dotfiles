@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  hmDir,
   ...
 }:
 
@@ -22,7 +23,7 @@
 
   xdg.configFile = {
     nvim = {
-      source = config.lib.file.mkOutOfStoreSymlink "${builtins.toString ./.}/lazyvim";
+      source = config.lib.file.mkOutOfStoreSymlink "${hmDir}/editors/neovim/lazyvim";
       recursive = true;
     };
   };

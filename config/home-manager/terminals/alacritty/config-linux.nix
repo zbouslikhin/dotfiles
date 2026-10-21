@@ -2,17 +2,18 @@
   config,
   pkgs,
   lib,
+  hmDir,
   ...
 }:
 
-lib.mkIf (config.home.sessionVariables.activeOS == "linux") {
+lib.mkIf pkgs.stdenv.isLinux {
   programs.alacritty = {
     enable = true;
   };
 
   xdg.configFile = {
     alacritty = {
-      source = config.lib.file.mkOutOfStoreSymlink "${builtins.toString ./.}/alacritty/";
+      source = config.lib.file.mkOutOfStoreSymlink "${hmDir}/terminals/alacritty/alacritty";
       recursive = true;
     };
   };
