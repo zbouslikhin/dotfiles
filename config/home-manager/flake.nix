@@ -68,7 +68,6 @@
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
-            config.permittedInsecurePackages = lib.optionals isDarwin [ "arc-browser-1.106.0-66192" ];
           };
           extraSpecialArgs = {
             inherit host wsl dotfilesDir;

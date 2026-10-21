@@ -14,7 +14,6 @@ lib.mkIf pkgs.stdenv.isLinux {
   xdg.configFile = {
     alacritty = {
       source = config.lib.file.mkOutOfStoreSymlink "${hmDir}/terminals/alacritty/alacritty";
-      recursive = true;
     };
   };
 

@@ -20,7 +20,7 @@
     autosuggestion.enable = true;
     enableCompletion = true;
 
-    initExtra = ''
+    initContent = ''
       source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
       function y() {
@@ -43,7 +43,7 @@
       hm-build = "nh home switch";
       hm-clean = "nix-collect-garbage --delete-old";
       flake-update = "nix flake update --flake ${hmDir}";
-      ls = "exa --long --header --icons";
+      ls = "exa --long --header --icons=auto";
       lsa = "ls --all";
       ff = "fzf";
     };
