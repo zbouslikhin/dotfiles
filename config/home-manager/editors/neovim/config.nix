@@ -13,6 +13,10 @@
   programs = {
     neovim = {
       enable = true;
+      extraPackages = [
+        pkgs.fd
+        pkgs.nodejs
+      ] ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.wl-clipboard ];
     };
   };
 
