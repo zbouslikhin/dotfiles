@@ -10,5 +10,6 @@ return {
   -- },
   opts = {
     picker_integration = true,
+    keymaps = { prefix = "<leader>U" }, -- default <leader>x clashes with LazyVim diagnostics
   },
 }
