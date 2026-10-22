@@ -81,7 +81,33 @@ esac
 
 info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR"
 
-# --- 2. Install Nix if missing -------------------------------------------------
+# --- 2. SSH keys (WSL) ---------------------------------------------------------
+# First, so the keys arrive even if a later step fails.
+if [ "$DOTFILES_HOST" = wsl ]; then
+  win_user=$(/mnt/c/Windows/System32/cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r' || true)
+  win_ssh="/mnt/c/Users/$win_user/.ssh"
+  if [ -n "$win_user" ] && [ -d "$win_ssh" ]; then
+    info "Copying SSH keys from $win_ssh (existing files are kept)"
+    # Keep subfolders: ssh config may point at e.g. ~/.ssh/work/id_rsa.
+    (cd "$win_ssh" && find . -type d) | while IFS= read -r d; do
+      mkdir -p "$HOME/.ssh/$d"
+      chmod 700 "$HOME/.ssh/$d"
+    done
+    (cd "$win_ssh" && find . -type f) | while IFS= read -r f; do
+      dest="$HOME/.ssh/${f#./}"
+      [ -e "$dest" ] && continue
+      cp "$win_ssh/$f" "$dest"
+      case "$dest" in
+      *.pub | */known_hosts* | */config) chmod 644 "$dest" ;;
+      *) chmod 600 "$dest" ;;
+      esac
+    done
+  else
+    warn "No Windows SSH folder found at $win_ssh; skipping key copy."
+  fi
+fi
+
+# --- 3. Install Nix if missing -------------------------------------------------
 load_nix() {
   for f in /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh "$HOME/.nix-profile/etc/profile.d/nix.sh"; do
     # shellcheck disable=SC1090
@@ -94,6 +120,10 @@ load_nix
 if command -v nix >/dev/null 2>&1; then
   info "Nix already installed"
 else
+  # The installer needs systemd; the old built-in WSL has none.
+  if [ "$DOTFILES_HOST" = wsl ] && [ ! -d /run/systemd/system ]; then
+    die "systemd is not running. In PowerShell run 'wsl --update' then 'wsl --shutdown', reopen Ubuntu and re-run."
+  fi
   info "Installing Nix (Determinate installer, flakes enabled)"
   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix |
     sh -s -- install --no-confirm
@@ -101,29 +131,7 @@ else
   command -v nix >/dev/null 2>&1 || die "Nix installed but not on PATH; open a new shell and re-run."
 fi
 
-# --- 3. SSH keys (WSL) and the repo -------------------------------------------
-if [ "$DOTFILES_HOST" = wsl ]; then
-  win_user=$(/mnt/c/Windows/System32/cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r' || true)
-  win_ssh="/mnt/c/Users/$win_user/.ssh"
-  if [ -n "$win_user" ] && [ -d "$win_ssh" ]; then
-    info "Copying SSH keys from $win_ssh (existing files are kept)"
-    mkdir -p "$HOME/.ssh"
-    chmod 700 "$HOME/.ssh"
-    for src in "$win_ssh"/*; do
-      [ -f "$src" ] || continue
-      dest="$HOME/.ssh/$(basename "$src")"
-      [ -e "$dest" ] && continue
-      cp "$src" "$dest"
-      case "$dest" in
-      *.pub | */known_hosts* | */config) chmod 644 "$dest" ;;
-      *) chmod 600 "$dest" ;;
-      esac
-    done
-  else
-    warn "No Windows SSH folder found at $win_ssh; skipping key copy."
-  fi
-fi
-
+# --- 4. The repo -----------------------------------------------------------
 # git may be missing on a new machine; Nix can provide it.
 if command -v git >/dev/null 2>&1 && git --version >/dev/null 2>&1; then
   git() { command git "$@"; }
@@ -144,7 +152,7 @@ else
   git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
 # Push over SSH once a key is available (any name, not just id_*).
-if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && grep -qs "PRIVATE KEY" "$HOME"/.ssh/*; then
+if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && grep -rqs "PRIVATE KEY" "$HOME/.ssh"; then
   git -C "$DOTFILES_DIR" remote set-url origin "$REPO_SSH"
 fi
 
@@ -158,13 +166,13 @@ DOTFILES_HOST=$DOTFILES_HOST
 EOF
 info "Wrote $env_file"
 
-# --- 4. Apply the Home Manager config ------------------------------------------
+# --- 5. Apply the Home Manager config ------------------------------------------
 # path: makes Nix include the gitignored machine.env.
 info "Switching to home-manager config '$DOTFILES_USER' ($DOTFILES_HOST)"
 nix run home-manager/master -- switch -b "hm-backup-$(date +%Y%m%d%H%M%S)" \
   --flake "path:$hm_dir#$DOTFILES_USER"
 
-# --- 5. Make the Nix zsh the login shell ---------------------------------------
+# --- 6. Make the Nix zsh the login shell ---------------------------------------
 zsh_path=""
 for p in "$HOME/.nix-profile/bin/zsh" "$HOME/.local/state/nix/profile/bin/zsh" \
   "/etc/profiles/per-user/$DOTFILES_USER/bin/zsh"; do
