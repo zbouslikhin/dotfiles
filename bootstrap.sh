@@ -3,6 +3,9 @@
 #
 #   curl -L https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.sh | sh
 #
+# On Windows use bootstrap.ps1 instead; it sets up WSL and then runs this.
+# No questions are asked; the only prompt is the sudo password (none on WSL).
+#
 # Overrides (export before running, or put before `sh`):
 #   DOTFILES_USER    login name the config is built for   (default: current user)
 #   DOTFILES_DIR     where the repo is cloned             (default: ~/dotfiles)
@@ -23,21 +26,6 @@ warn() { printf '\033[0;33m!!  %s\033[0m\n' "$*" >&2; }
 die() {
   printf '\033[0;31mxx  %s\033[0m\n' "$*" >&2
   exit 1
-}
-
-# Under `curl | sh` stdin is the script, so prompts read from the terminal.
-# /dev/tty exists even without one, so check it can actually be opened.
-has_tty() { (: </dev/tty) 2>/dev/null; }
-
-ask() {
-  # ask <prompt> <default>
-  if has_tty; then
-    printf '%s [%s]: ' "$1" "$2" >/dev/tty
-    read -r reply </dev/tty || reply=""
-    printf '%s' "${reply:-$2}"
-  else
-    printf '%s' "$2"
-  fi
 }
 
 # --- 1. Detect OS, WSL and the matching config --------------------------------
@@ -66,9 +54,9 @@ if [ -f "$env_file" ]; then
   DOTFILES_DIR="${DOTFILES_DIR:-$saved_dir}"
   DOTFILES_HOST="${DOTFILES_HOST:-$saved_host}"
 else
-  DOTFILES_USER="${DOTFILES_USER:-$(ask 'Username for the config' "$(id -un)")}"
-  DOTFILES_DIR="${DOTFILES_DIR:-$(ask 'Clone the repo to' "$default_dir")}"
-  DOTFILES_HOST="${DOTFILES_HOST:-$(ask 'Config (macos/wsl/ubuntu)' "$detected_host")}"
+  DOTFILES_USER="${DOTFILES_USER:-$(id -un)}"
+  DOTFILES_DIR="$default_dir"
+  DOTFILES_HOST="${DOTFILES_HOST:-$detected_host}"
 fi
 DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
 
@@ -80,6 +68,15 @@ esac
   warn "DOTFILES_USER ($DOTFILES_USER) is not the current user ($(id -un)); the switch will likely fail."
 
 info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR"
+
+# Ask for sudo once, up front, and keep it fresh so a long switch doesn't ask again.
+# (bootstrap.ps1 grants password-free sudo on WSL, so this never prompts there.)
+if [ "$(id -u)" -ne 0 ]; then
+  sudo -v </dev/tty 2>/dev/null || sudo -v || die "sudo is needed to install Nix and set the login shell."
+  while sudo -n true 2>/dev/null; do sleep 50; done &
+  sudo_keepalive=$!
+  trap 'kill "$sudo_keepalive" 2>/dev/null || true' EXIT
+fi
 
 # --- 2. SSH keys (WSL) ---------------------------------------------------------
 # First, so the keys arrive even if a later step fails.
@@ -192,12 +189,8 @@ else
 fi
 if [ "$current_shell" != "$zsh_path" ]; then
   info "Changing login shell to $zsh_path"
-  # chsh asks for the password on stdin, which is the script under `curl | sh`.
-  if has_tty; then
-    chsh -s "$zsh_path" </dev/tty || warn "chsh failed; run: chsh -s $zsh_path"
-  else
-    chsh -s "$zsh_path" || warn "chsh failed; run: chsh -s $zsh_path"
-  fi
+  # Through sudo, so it reuses the approval from the start instead of asking again.
+  sudo chsh -s "$zsh_path" "$(id -un)" || warn "chsh failed; run: chsh -s $zsh_path"
 fi
 
 info "Done. Open a new terminal. Update later with: nh home switch"

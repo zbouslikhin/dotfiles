@@ -4,21 +4,27 @@ Home Manager config for macOS, WSL and Ubuntu, used in place from the clone.
 
 ## New machine
 
-1. **Windows only:** install WSL and open Ubuntu:
-   ```bash
-   wsl --install
-   ```
-2. Run the bootstrap:
-   ```bash
-   curl -L https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.sh | sh
-   ```
+One command; both are safe to re-run.
 
-It installs Nix if needed, copies your Windows SSH keys (WSL), clones the repo, applies the config and
-makes the Nix zsh your login shell. It is safe to re-run.
+**Windows** (PowerShell, no admin needed):
+```powershell
+irm https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.ps1 | iex
+```
+It installs or updates WSL (approve one admin prompt), installs Ubuntu, creates your Linux user (asks
+for its password once, only if the user doesn't exist yet), turns on systemd, then runs the Linux
+bootstrap inside it. If Windows needs a restart for WSL, setup carries on by itself after you sign in.
 
-It asks for the username, the clone location and the config (`macos`, `wsl` or `ubuntu`, detected
-by default) and saves them to `config/home-manager/machine.env`, which is not committed. To skip the
-questions, set `DOTFILES_USER`, `DOTFILES_DIR`, `DOTFILES_HOST` or `DOTFILES_BRANCH` before `sh`.
+**macOS / Linux:**
+```bash
+curl -L https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.sh | sh
+```
+It asks for your sudo password once, then installs Nix, copies your Windows SSH keys (WSL), clones the
+repo, applies the config and makes the Nix zsh your login shell.
+
+No other questions are asked. The username, clone location and config (`macos`, `wsl` or `ubuntu`)
+are detected and saved to `config/home-manager/machine.env`, which is not committed. To override them,
+set `DOTFILES_USER`, `DOTFILES_DIR`, `DOTFILES_HOST` or `DOTFILES_BRANCH` first (on Windows also
+`DOTFILES_DISTRO`, the WSL distro name).
 
 ## Updating
 
