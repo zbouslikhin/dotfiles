@@ -72,7 +72,9 @@ info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR"
 # Ask for sudo once, up front, and keep it fresh so a long switch doesn't ask again.
 # (bootstrap.ps1 grants password-free sudo on WSL, so this never prompts there.)
 if [ "$(id -u)" -ne 0 ]; then
-  sudo -v </dev/tty 2>/dev/null || sudo -v || die "sudo is needed to install Nix and set the login shell."
+  # sudo -v asks for a password unless *every* rule is NOPASSWD, so test with -n first.
+  sudo -n true 2>/dev/null || sudo -v </dev/tty 2>/dev/null || sudo -v ||
+    die "sudo is needed to install Nix and set the login shell."
   while sudo -n true 2>/dev/null; do sleep 50; done &
   sudo_keepalive=$!
   trap 'kill "$sudo_keepalive" 2>/dev/null || true' EXIT

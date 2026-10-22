@@ -39,9 +39,10 @@ function Install-Dotfiles {
     catch { @() }
   }
 
-  # Runs a sh script as root in the distro. The script goes in on stdin, so no quoting issues.
+  # Runs a sh script as root in the distro and returns its output. The script goes in on
+  # stdin, and --exec skips WSL's own shell (which would expand $ a second time).
   function Invoke-Root([string]$script) {
-    $script | & wsl.exe -d $distro -u root -- sh -c "$clean | sh -e"
+    $script | & wsl.exe -d $distro -u root --exec sh -c "$clean | sh -e"
     if ($LASTEXITCODE -ne 0) { Fail "Command failed in $distro as root." }
   }
 
@@ -110,9 +111,7 @@ exit $LASTEXITCODE
 
   # --- 3. Linux user and systemd -----------------------------------------------
   Start-Distro
-  $user = (& wsl.exe -d $distro -u root -- sh -c "getent passwd | awk -F: '`$3 >= 1000 && `$3 < 60000 { print `$1; exit }'" |
-    Out-String).Trim()
-  if ($LASTEXITCODE -ne 0) { Fail "Could not read the users in $distro." }
+  $user = (Invoke-Root "getent passwd | awk -F: '`$3 >= 1000 && `$3 < 60000 { print `$1; exit }'" | Out-String).Trim()
   if ($user) {
     Info "Using Linux user '$user'"
   } else {
@@ -129,7 +128,7 @@ exit $LASTEXITCODE
     }
     Invoke-Root "useradd -m -s /bin/bash -G sudo '$user'"
     # The password goes in on stdin, never on a command line.
-    "${user}:$plain" | & wsl.exe -d $distro -u root -- sh -c "$clean | chpasswd"
+    "${user}:$plain" | & wsl.exe -d $distro -u root --exec sh -c "$clean | chpasswd"
     if ($LASTEXITCODE -ne 0) { Fail 'Setting the password failed.' }
     $plain = $null; $check = $null
   }
@@ -150,13 +149,13 @@ set_key boot systemd true
 set_key user default '$user'
 [ "`$before" = "`$(cat `$conf)" ] || touch /tmp/.wsl-conf-changed
 "@
-  $changed = & wsl.exe -d $distro -u root -- sh -c 'rm /tmp/.wsl-conf-changed 2>/dev/null && echo yes'
+  $changed = & wsl.exe -d $distro -u root --exec sh -c 'rm /tmp/.wsl-conf-changed 2>/dev/null && echo yes'
   if ($changed -eq 'yes') {
     Info "Restarting $distro to apply /etc/wsl.conf"
     & wsl.exe --terminate $distro | Out-Null
     Start-Distro
   }
-  & wsl.exe -d $distro -u root -- sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do [ -d /run/systemd/system ] && exit 0; sleep 1; done; exit 1'
+  & wsl.exe -d $distro -u root --exec sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do [ -d /run/systemd/system ] && exit 0; sleep 1; done; exit 1'
   if ($LASTEXITCODE -ne 0) { Fail "systemd is not running in $distro." }
 
   # --- 4. bootstrap.sh inside the distro ----------------------------------------
@@ -170,7 +169,7 @@ set_key user default '$user'
       ForEach-Object { $_.Name }
     $env:WSLENV = (@($env:WSLENV -split ':') + $pass | Where-Object { $_ } | Select-Object -Unique) -join ':'
     Info "Running bootstrap.sh in $distro as $user"
-    & wsl.exe -d $distro -u $user --cd '~' -- sh -c "curl -fsSL $raw/bootstrap.sh | sh"
+    & wsl.exe -d $distro -u $user --cd '~' --exec sh -c "curl -fsSL $raw/bootstrap.sh | sh"
     if ($LASTEXITCODE -ne 0) { Fail 'bootstrap.sh failed; see the output above. Run the same command again to retry.' }
   } finally {
     & wsl.exe -d $distro -u root -- rm -f $sudoers
