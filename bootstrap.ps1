@@ -17,6 +17,10 @@ function Install-Dotfiles {
   $ErrorActionPreference = 'Stop'
   # wsl.exe prints UTF-16 unless told otherwise.
   $env:WSL_UTF8 = '1'
+  # Text piped to wsl.exe: UTF-8 without the BOM Windows PowerShell adds by default.
+  $OutputEncoding = New-Object System.Text.UTF8Encoding $false
+  # Strips a BOM and CRs from piped text on the Linux side, in case one still gets through.
+  $clean = 'sed ''1s/^\xEF\xBB\xBF//; s/\r$//'''
 
   $branch = if ($env:DOTFILES_BRANCH) { $env:DOTFILES_BRANCH } else { 'main' }
   $distro = if ($env:DOTFILES_DISTRO) { $env:DOTFILES_DISTRO } else { 'Ubuntu' }
@@ -37,8 +41,19 @@ function Install-Dotfiles {
 
   # Runs a sh script as root in the distro. The script goes in on stdin, so no quoting issues.
   function Invoke-Root([string]$script) {
-    $script | & wsl.exe -d $distro -u root -- sh -c "tr -d '\r' | sh -e"
+    $script | & wsl.exe -d $distro -u root -- sh -c "$clean | sh -e"
     if ($LASTEXITCODE -ne 0) { Fail "Command failed in $distro as root." }
+  }
+
+  # The first start after a WSL update can fail transiently (e.g. low memory), so retry.
+  function Start-Distro {
+    for ($i = 1; $i -le 3; $i++) {
+      $out = & wsl.exe -d $distro -u root -- true 2>&1 | Out-String
+      if ($LASTEXITCODE -eq 0) { return }
+      Write-Host "    $distro did not start (try $i of 3): $($out.Trim())" -ForegroundColor Yellow
+      Start-Sleep -Seconds 10
+    }
+    Fail "$distro will not start. Close some programs (WSL needs free memory) or restart Windows, then run the same command again."
   }
 
   # --- 1. WSL itself -----------------------------------------------------------
@@ -94,8 +109,10 @@ exit $LASTEXITCODE
   }
 
   # --- 3. Linux user and systemd -----------------------------------------------
+  Start-Distro
   $user = (& wsl.exe -d $distro -u root -- sh -c "getent passwd | awk -F: '`$3 >= 1000 && `$3 < 60000 { print `$1; exit }'" |
     Out-String).Trim()
+  if ($LASTEXITCODE -ne 0) { Fail "Could not read the users in $distro." }
   if ($user) {
     Info "Using Linux user '$user'"
   } else {
@@ -112,7 +129,7 @@ exit $LASTEXITCODE
     }
     Invoke-Root "useradd -m -s /bin/bash -G sudo '$user'"
     # The password goes in on stdin, never on a command line.
-    "${user}:$plain" | & wsl.exe -d $distro -u root -- sh -c "tr -d '\r' | chpasswd"
+    "${user}:$plain" | & wsl.exe -d $distro -u root -- sh -c "$clean | chpasswd"
     if ($LASTEXITCODE -ne 0) { Fail 'Setting the password failed.' }
     $plain = $null; $check = $null
   }
@@ -137,6 +154,7 @@ set_key user default '$user'
   if ($changed -eq 'yes') {
     Info "Restarting $distro to apply /etc/wsl.conf"
     & wsl.exe --terminate $distro | Out-Null
+    Start-Distro
   }
   & wsl.exe -d $distro -u root -- sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do [ -d /run/systemd/system ] && exit 0; sleep 1; done; exit 1'
   if ($LASTEXITCODE -ne 0) { Fail "systemd is not running in $distro." }
