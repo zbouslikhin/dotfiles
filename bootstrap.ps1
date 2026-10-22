@@ -32,7 +32,8 @@ function Install-Dotfiles {
   }
 
   # 3. A Linux user (the first one created is uid 1000), systemd, and the default user.
-  $user = (& wsl.exe -d Ubuntu -u root --exec sh -c 'id -nu 1000 2>/dev/null')
+  $user = (& wsl.exe -d Ubuntu -u root --exec sh -c 'id -nu 1000 2>/dev/null || true')
+  if ($LASTEXITCODE -ne 0) { throw 'Ubuntu did not start. Close some programs to free memory, or restart Windows, then run again.' }
   if (-not $user) {
     $user = $env:USERNAME.ToLower()
     Write-Host "==> Creating Linux user '$user'"
