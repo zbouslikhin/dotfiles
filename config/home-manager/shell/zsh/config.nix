@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  username,
+  hmDir,
   ...
 }:
 
@@ -11,12 +11,16 @@
     pkgs.zsh-vi-mode
   ];
 
+  programs.nh.enable = true;
+  # path: so the gitignored machine.env is visible to the flake.
+  home.sessionVariables.NH_FLAKE = "path:${hmDir}";
+
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
     enableCompletion = true;
 
-    initExtra = ''
+    initContent = ''
       source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
       function y() {
@@ -36,10 +40,10 @@
     };
 
     shellAliases = {
-      hm-build = "source /home/zaidb/Documents/dotfiles/config/home-manager/shell/zsh/refresh_hm.sh";
+      hm-build = "nh home switch";
       hm-clean = "nix-collect-garbage --delete-old";
-      flake-update = "nix flake update";
-      ls = "exa --long --header --icons";
+      flake-update = "nix flake update --flake ${hmDir}";
+      ls = "exa --long --header --icons=auto";
       lsa = "ls --all";
       ff = "fzf";
     };

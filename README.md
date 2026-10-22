@@ -1,106 +1,45 @@
-# WSL Setup Guide
+# dotfiles
 
----
+Home Manager config for macOS, WSL and Ubuntu, used in place from the clone.
 
-# TODO:
-1. Get automatically username and /home or /Users
-2. Do not install GUI apps if WSL
-3. Add gcc compiler
+## New machine
 
----
+One command; both are safe to re-run.
 
-## Step 1: Update WSL
+**Windows** (PowerShell, no admin needed):
+```powershell
+irm https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.ps1 | iex
+```
+It installs or updates WSL (approve one admin prompt), installs Ubuntu, creates your Linux user
+(Linux asks for its password, only if the user doesn't exist yet), turns on systemd, then runs the
+Linux bootstrap inside it. Ubuntu uses public DNS (1.1.1.1), not the DNS Windows relays, which can
+stop answering; internal names on a VPN or company network will not resolve in WSL. If WSL needs a
+Windows restart, restart and run it again.
+
+**macOS / Linux:**
 ```bash
-wsl --update
+curl -L https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.sh | sh
+```
+It installs Nix, copies your Windows SSH keys (WSL, if `~/.ssh` doesn't exist yet), clones the repo,
+applies the config and makes the Nix zsh your login shell. sudo asks for your password (not on WSL).
+
+The username, clone location and config (`macos`, `wsl` or `ubuntu`) are detected and saved to
+`config/home-manager/machine.env`, which is not committed. To choose them yourself, set
+`DOTFILES_DIR`, `DOTFILES_HOST` or `DOTFILES_BRANCH` before the first run.
+
+## Updating
+
+Edit the files in the clone, then:
+
+```bash
+nh home switch
 ```
 
-## Step 2: Install Ubuntu
-```bash
-wsl --install
-```
+`NH_FLAKE` points at `path:<clone>/config/home-manager`. The `path:` prefix is needed so Nix sees the
+gitignored `machine.env`; use it with `home-manager switch --flake` too. Neovim and zellij configs are
+symlinked straight into the clone, so their edits apply without a switch.
 
-## Step 3: Install Development Dependencies
-Run the following command to install essential development tools and libraries:
-```bash
-sudo apt update && sudo apt install -y \
-    build-essential libssl-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev \
-    curl git libncursesw5-dev xz-utils tk-dev \
-    libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-```
+## TODO
 
-## Step 4: Install Nix
-Install Nix with the following command:
-```bash
-sh <(curl -L https://nixos.org/nix/install) --daemon
-```
-
-### Test Nix Installation
-Verify that Nix is installed correctly:
-```bash
-nix-shell -p nix-info --run "nix-info -m"
-```
-
-## Step 5: Configure SSH
-Copy your SSH keys from Windows:
-```bash
-cp -R /mnt/c/Users/<YourWindowsUsername>/.ssh/ ~/.ssh
-```
-Replace `<YourWindowsUsername>` with your actual Windows username.
-
-## Step 6: Clone Dotfiles Repository
-Change to your home directory:
-```bash
-git clone git@github.com:zbouslikhin/dotfiles.git ~/
-```
-
-## Step 7: Copy Dotfiles
-Copy the configuration files:
-```bash
-cp -R dotfiles/config/ ~/.config
-```
-
-## Step 8: Copy Configuration Files
-Copy the Home Manager configuration:
-```bash
-cp -R /home/zaidb/dotfiles/config/home-manager ~/.config/home-manager
-```
-Copy the Nix configuration:
-```bash
-cp -R /home/zaidb/dotfiles/config/nix ~/.config/nix
-```
-
-## Step 9: Update Nix Channels
-Update Nix channels:
-```bash
-nix-channel --update
-```
-
-## Step 10: Install Home Manager
-Install Home Manager with the following command:
-```bash
-nix-env -iA nixpkgs.home-manager
-```
-
-## Step 11: Activate Home Manager as a Flake
-Activate Home Manager using the Flake configuration:
-```bash
-home-manager switch --flake ~/.config/home-manager#zaidb-wsl
-```
-
-## Step 12: Set Zsh as Default Shell
-Add the following line to `sudo vim /etc/shells`
-```sh
-/home/zaidb/.nix-profile/bin/zsh
-```
-Then set Zsh as your default shell:
-```bash
-chsh -s /home/zaidb/.nix-profile/bin/zsh
-```
-
-## Step 13: Install Python
-```bash
-asdf plugin-add python
-asdf install python latest
-asdf global python latest
-```
+1. Add gcc compiler
+2. Replace asdf (Python setup is still manual: `asdf plugin add python && asdf install python latest`)

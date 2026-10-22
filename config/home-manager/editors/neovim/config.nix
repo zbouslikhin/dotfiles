@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  hmDir,
   ...
 }:
 
@@ -13,6 +14,8 @@
   programs = {
     neovim = {
       enable = true;
+      # init.lua comes from the linked lazyvim folder; HM's own settings load via the wrapper.
+      sideloadInitLua = true;
       extraPackages = [
         pkgs.fd
         pkgs.nodejs
@@ -22,8 +25,7 @@
 
   xdg.configFile = {
     nvim = {
-      source = config.lib.file.mkOutOfStoreSymlink "${builtins.toString ./.}/lazyvim";
-      recursive = true;
+      source = config.lib.file.mkOutOfStoreSymlink "${hmDir}/editors/neovim/lazyvim";
     };
   };
 }

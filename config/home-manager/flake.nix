@@ -17,117 +17,69 @@
       ...
     }:
     let
-      username = "qzaid";
-      root = "home";
+      # Per-machine settings, written by bootstrap.sh and not committed. Lines like
+      # KEY="value" are both a shell env file and TOML. The flake must be referenced as
+      # `path:<dir>` (NH_FLAKE is), or Nix ignores this gitignored file.
+      env = builtins.fromTOML (builtins.readFile ./machine.env);
 
+      mkHome =
+        {
+          system,
+          wsl ? false,
+          stateVersion,
+        }:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          extraSpecialArgs = {
+            inherit wsl;
+            # This flake inside the checkout, for out-of-store symlinks.
+            hmDir = "${env.DOTFILES_DIR}/config/home-manager";
+          };
+          modules = [
+            {
+              home = {
+                inherit stateVersion;
+                username = env.DOTFILES_USER;
+                homeDirectory = "${if nixpkgs.lib.hasSuffix "darwin" system then "/Users" else "/home"}/${env.DOTFILES_USER}";
+              };
+              programs.home-manager.enable = true;
+
+              imports = [
+                ./apps
+                ./editors
+                ./fixes
+                ./fonts
+                ./programming
+                ./shell
+                ./terminals
+              ];
+            }
+          ];
+        };
+
+      hosts = {
+        macos = mkHome {
+          system = "aarch64-darwin";
+          stateVersion = "25.11";
+        };
+        wsl = mkHome {
+          system = "x86_64-linux";
+          wsl = true;
+          stateVersion = "24.11";
+        };
+        ubuntu = mkHome {
+          system = "x86_64-linux";
+          stateVersion = "24.11";
+        };
+      };
     in
     {
-      homeConfigurations = {
-        # # macOS configuration
-        zaidb-macos = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            system = "aarch64-darwin";
-            config.allowUnfree = true;
-          };
-          modules = [
-            (
-              { pkgs, lib, ... }:
-              {
-                home = {
-                  username = username;
-                  homeDirectory = "/${root}/${username}";
-                  stateVersion = "25.11";
-                };
-
-                imports = [
-                  ./editors
-                  ./shell
-                  ./programming
-                  ./fonts
-                  ./terminals
-                  ./apps
-                ];
-              }
-            )
-          ];
-        };
-
-        # WSL configuration
-        # TODO: move to separate file once relative paths work
-        # https://github.com/NixOS/nix/issues/3978
-        zaidb-wsl = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            system = "x86_64-linux";
-            config.allowUnfree = true;
-          };
-          modules = [
-            (
-              { pkgs, lib, ... }:
-              {
-                home = {
-                  username = username;
-                  homeDirectory = "/${root}/${username}";
-                  stateVersion = "24.11";
-                  activation = {
-                    copyWinSshKeys = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-                      #!/bin/bash
-                      SCRIPT="/${root}/${username}/.config/home-manager/copy_ssh.sh"
-                      if [ -f "$SCRIPT" ]; then
-                        source $SCRIPT
-                      else
-                        echo "$SCRIPT does not exist"
-                      fi
-                    '';
-                  };
-                };
-
-                imports = [
-                  ./editors
-                  ./shell
-                  ./programming
-                  ./fonts
-                  ./terminals/yazi/config.nix
-                ];
-
-              }
-            )
-          ];
-        };
-
-        zaidb-ubuntu = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            system = "x86_64-linux";
-            config.allowUnfree = true;
-          };
-          modules = [
-            (
-              { pkgs, lib, ... }:
-              {
-                home = {
-                  username = username;
-                  homeDirectory = "/${root}/${username}";
-                  stateVersion = "24.11";
-                };
-
-                imports = [
-                  ./apps
-                  ./editors
-                  ./fonts
-                  ./programming
-                  ./shell
-                  ./terminals
-                  ./fixes
-                ];
-
-                home.sessionVariables = {
-                  activeOS = "linux";
-                };
-
-              }
-            )
-          ];
-        };
-
+      # `<username>` is this machine's host, so `nh home switch` needs no `#name`.
+      homeConfigurations = hosts // {
+        ${env.DOTFILES_USER} = hosts.${env.DOTFILES_HOST};
       };
     };
 }

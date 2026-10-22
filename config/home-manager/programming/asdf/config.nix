@@ -4,13 +4,10 @@
   home.packages = [
     pkgs.asdf-vm
   ];
-  programs.nh = {
-    enable = true;
-  };
-
   programs = {
     zsh = {
-      initExtra = ". $HOME/.nix-profile/share/asdf-vm/asdf.sh";
+      # asdf 0.16+ has no asdf.sh; putting the shims on PATH is all it needs.
+      initContent = ''export PATH="''${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"'';
     };
   };
 }

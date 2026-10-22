@@ -5,7 +5,7 @@
   ...
 }:
 
-lib.mkIf (config.home.sessionVariables.activeOS == "linux") {
+lib.mkIf pkgs.stdenv.isLinux {
   home.packages = [
     pkgs.xclip
   ];
