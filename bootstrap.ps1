@@ -50,8 +50,9 @@ function Install-Dotfiles {
   $sudoers = '/etc/sudoers.d/zz-dotfiles-bootstrap'
   Root "echo '$user ALL=(ALL) NOPASSWD: ALL' > $sudoers"
   try {
+    # Download first: with `curl | sh`, a failed download still "succeeds".
     & wsl.exe -d Ubuntu -u $user --cd '~' --exec env "DOTFILES_BRANCH=$branch" sh -c `
-      "curl -fsSL https://raw.githubusercontent.com/zbouslikhin/dotfiles/$branch/bootstrap.sh | sh"
+      "curl -fsSL --retry 5 --retry-all-errors -o /tmp/bootstrap.sh https://raw.githubusercontent.com/zbouslikhin/dotfiles/$branch/bootstrap.sh && sh /tmp/bootstrap.sh"
     if ($LASTEXITCODE -ne 0) { throw 'bootstrap.sh failed; see above. Run the same command again to retry.' }
   } finally {
     Root "rm -f $sudoers"
