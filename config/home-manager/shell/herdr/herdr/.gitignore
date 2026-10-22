@@ -1,0 +1,4 @@
+# herdr keeps its sockets, logs and session state in this folder too; only the config is ours.
+*
+!.gitignore
+!config.toml
