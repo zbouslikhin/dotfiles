@@ -73,7 +73,7 @@ nix run home-manager/master -- switch -b "backup-$(date +%s)" \
 # --- 6. Nix zsh as the login shell ---------------------------------------------
 zsh_path="$HOME/.nix-profile/bin/zsh"
 grep -qx "$zsh_path" /etc/shells || echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
-sudo chsh -s "$zsh_path" "$USER"
+[ "${SHELL:-}" = "$zsh_path" ] || sudo chsh -s "$zsh_path" "$USER"
 
 # --- 7. Claude Code and its mods -----------------------------------------------
 # Anthropic's installer, which keeps claude up to date by itself.
