@@ -40,9 +40,11 @@ function Install-Dotfiles {
     Root "useradd -m -s /bin/bash -G sudo $user"
     & wsl.exe -d Ubuntu -u root --exec passwd $user
   }
-  $conf = "[boot]`nsystemd=true`n[user]`ndefault=$user"
+  # DNS is pinned to 1.1.1.1: WSL's default DNS (relayed by Windows) can stop answering.
+  $conf = "[boot]`nsystemd=true`n[user]`ndefault=$user`n[network]`ngenerateResolvConf=false"
   if ((& wsl.exe -d Ubuntu -u root --exec cat /etc/wsl.conf) -join "`n" -ne $conf) {
     Root "printf '$($conf -replace "`n", '\n')\n' > /etc/wsl.conf"
+    Root 'rm -f /etc/resolv.conf && echo nameserver 1.1.1.1 > /etc/resolv.conf'
     & wsl.exe --terminate Ubuntu | Out-Null
   }
 
