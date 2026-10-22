@@ -89,5 +89,7 @@ if [ ! -d "$mods/.git" ]; then
     info "Skipped the Claude Code mods: no access to the private claude-mods repo."
 fi
 [ -d "$mods/.git" ] && sh "$mods/install.sh"
+# Lets herdr show each Claude session's state (adds a hook to ~/.claude/settings.json).
+herdr integration install claude
 
 info "Done. Open a new terminal. Update later with: nh home switch"
