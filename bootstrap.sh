@@ -143,8 +143,8 @@ else
   info "Cloning $DOTFILES_REPO ($DOTFILES_BRANCH) to $DOTFILES_DIR"
   git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
-# Push over SSH once a key is available.
-if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && ls "$HOME"/.ssh/id_* >/dev/null 2>&1; then
+# Push over SSH once a key is available (any name, not just id_*).
+if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && grep -qs "PRIVATE KEY" "$HOME"/.ssh/*; then
   git -C "$DOTFILES_DIR" remote set-url origin "$REPO_SSH"
 fi
 
