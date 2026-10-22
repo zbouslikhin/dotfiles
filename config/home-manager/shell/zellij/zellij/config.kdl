@@ -4,7 +4,8 @@ plugins {
         // Enabled at start?
         is_enabled true
         // Lock when any open these programs open.
-        triggers "nvim|vim|git|fzf|zoxide|atuin"
+        // herdr: it's a multiplexer of its own, so all keys go to it (Ctrl+g unlocks zellij).
+        triggers "nvim|vim|git|fzf|zoxide|atuin|herdr"
         // Reaction to input occurs after this many seconds. (default=0.3)
         // (An existing scheduled reaction prevents additional reactions.)
         reaction_seconds "0.3"
