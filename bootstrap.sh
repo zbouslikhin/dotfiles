@@ -4,195 +4,75 @@
 #   curl -L https://raw.githubusercontent.com/zbouslikhin/dotfiles/main/bootstrap.sh | sh
 #
 # On Windows use bootstrap.ps1 instead; it sets up WSL and then runs this.
-# No questions are asked; the only prompt is the sudo password (none on WSL).
-#
-# Overrides (export before running, or put before `sh`):
-#   DOTFILES_USER    login name the config is built for   (default: current user)
-#   DOTFILES_DIR     where the repo is cloned             (default: ~/dotfiles)
-#   DOTFILES_HOST    macos | wsl | ubuntu                 (default: detected)
-#   DOTFILES_BRANCH  branch for the first clone           (default: main)
-#   DOTFILES_REPO    URL to clone from                    (default: GitHub over HTTPS)
+# Optional overrides, used on the first run only (later runs read machine.env):
+#   DOTFILES_DIR     where the repo is cloned   (default: ~/dotfiles)
+#   DOTFILES_HOST    macos | wsl | ubuntu       (default: detected)
+#   DOTFILES_BRANCH  branch to clone            (default: main)
+#   DOTFILES_REPO    URL to clone from          (default: GitHub over HTTPS)
 set -eu
-# home-manager and nh need $USER, which some shells (docker exec, cron) leave unset.
-USER="${USER:-$(id -un)}"
-export USER
+# home-manager and nh need $USER, which some shells leave unset.
+export USER="${USER:-$(id -un)}"
 
-REPO_HTTPS="https://github.com/zbouslikhin/dotfiles.git"
-DOTFILES_REPO="${DOTFILES_REPO:-$REPO_HTTPS}"
-REPO_SSH="git@github.com:zbouslikhin/dotfiles.git"
-
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+env_file="$DOTFILES_DIR/config/home-manager/machine.env"
 info() { printf '\033[0;34m==> %s\033[0m\n' "$*"; }
-warn() { printf '\033[0;33m!!  %s\033[0m\n' "$*" >&2; }
-die() {
-  printf '\033[0;31mxx  %s\033[0m\n' "$*" >&2
-  exit 1
-}
 
-# --- 1. Detect OS, WSL and the matching config --------------------------------
-case "$(uname -s)" in
-Darwin) detected_host=macos ;;
-Linux)
-  # Not /proc/version: containers on Docker Desktop share the WSL2 kernel.
-  if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ] ||
-    [ -e /proc/sys/fs/binfmt_misc/WSLInterop-late ]; then
-    detected_host=wsl
-  else
-    detected_host=ubuntu
-  fi
-  ;;
-*) die "Unsupported OS: $(uname -s)" ;;
-esac
-
-# Settings saved by an earlier run win over defaults, explicit overrides win over both.
-default_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
-env_file="$default_dir/config/home-manager/machine.env"
+# --- 1. Which config: saved by an earlier run, else detected ------------------
 if [ -f "$env_file" ]; then
-  saved_user=$(sed -n 's/^DOTFILES_USER=//p' "$env_file")
-  saved_dir=$(sed -n 's/^DOTFILES_DIR=//p' "$env_file")
-  saved_host=$(sed -n 's/^DOTFILES_HOST=//p' "$env_file")
-  DOTFILES_USER="${DOTFILES_USER:-$saved_user}"
-  DOTFILES_DIR="${DOTFILES_DIR:-$saved_dir}"
-  DOTFILES_HOST="${DOTFILES_HOST:-$saved_host}"
+  . "$env_file"
+elif [ "$(uname -s)" = Darwin ]; then
+  DOTFILES_HOST="${DOTFILES_HOST:-macos}"
+elif [ -n "${WSL_DISTRO_NAME:-}" ]; then
+  DOTFILES_HOST="${DOTFILES_HOST:-wsl}"
 else
-  DOTFILES_USER="${DOTFILES_USER:-$(id -un)}"
-  DOTFILES_DIR="$default_dir"
-  DOTFILES_HOST="${DOTFILES_HOST:-$detected_host}"
+  DOTFILES_HOST="${DOTFILES_HOST:-ubuntu}"
 fi
-DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
+info "Config: $DOTFILES_HOST, user: $USER, repo: $DOTFILES_DIR"
 
-case "$DOTFILES_HOST" in
-macos | wsl | ubuntu) ;;
-*) die "DOTFILES_HOST must be macos, wsl or ubuntu, got '$DOTFILES_HOST'" ;;
-esac
-[ "$DOTFILES_USER" = "$(id -un)" ] ||
-  warn "DOTFILES_USER ($DOTFILES_USER) is not the current user ($(id -un)); the switch will likely fail."
-
-info "Config: $DOTFILES_HOST, user: $DOTFILES_USER, repo: $DOTFILES_DIR"
-
-# Ask for sudo once, up front, and keep it fresh so a long switch doesn't ask again.
-# (bootstrap.ps1 grants password-free sudo on WSL, so this never prompts there.)
-if [ "$(id -u)" -ne 0 ]; then
-  # sudo -v asks for a password unless *every* rule is NOPASSWD, so test with -n first.
-  sudo -n true 2>/dev/null || sudo -v </dev/tty 2>/dev/null || sudo -v ||
-    die "sudo is needed to install Nix and set the login shell."
-  while sudo -n true 2>/dev/null; do sleep 50; done &
-  sudo_keepalive=$!
-  trap 'kill "$sudo_keepalive" 2>/dev/null || true' EXIT
-fi
-
-# --- 2. SSH keys (WSL) ---------------------------------------------------------
-# First, so the keys arrive even if a later step fails.
-if [ "$DOTFILES_HOST" = wsl ]; then
-  win_user=$(/mnt/c/Windows/System32/cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r' || true)
-  win_ssh="/mnt/c/Users/$win_user/.ssh"
-  if [ -n "$win_user" ] && [ -d "$win_ssh" ]; then
-    info "Copying SSH keys from $win_ssh (existing files are kept)"
-    # Keep subfolders: ssh config may point at e.g. ~/.ssh/work/id_rsa.
-    (cd "$win_ssh" && find . -type d) | while IFS= read -r d; do
-      mkdir -p "$HOME/.ssh/$d"
-      chmod 700 "$HOME/.ssh/$d"
-    done
-    (cd "$win_ssh" && find . -type f) | while IFS= read -r f; do
-      dest="$HOME/.ssh/${f#./}"
-      [ -e "$dest" ] && continue
-      cp "$win_ssh/$f" "$dest"
-      case "$dest" in
-      *.pub | */known_hosts* | */config) chmod 644 "$dest" ;;
-      *) chmod 600 "$dest" ;;
-      esac
-    done
-  else
-    warn "No Windows SSH folder found at $win_ssh; skipping key copy."
+# --- 2. SSH keys from Windows (WSL, first run only) ---------------------------
+if [ "$DOTFILES_HOST" = wsl ] && [ ! -d "$HOME/.ssh" ]; then
+  win_ssh="/mnt/c/Users/$(/mnt/c/Windows/System32/cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r')/.ssh"
+  if [ -d "$win_ssh" ]; then
+    info "Copying SSH keys from $win_ssh"
+    cp -r "$win_ssh" "$HOME/.ssh"
+    chmod -R go= "$HOME/.ssh"
   fi
 fi
 
-# --- 3. Install Nix if missing -------------------------------------------------
-load_nix() {
-  for f in /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh "$HOME/.nix-profile/etc/profile.d/nix.sh"; do
-    # shellcheck disable=SC1090
-    [ -f "$f" ] && . "$f" && return 0
-  done
-  return 0
-}
-
-load_nix
-if command -v nix >/dev/null 2>&1; then
-  info "Nix already installed"
-else
-  # The installer needs systemd; the old built-in WSL has none.
-  if [ "$DOTFILES_HOST" = wsl ] && [ ! -d /run/systemd/system ]; then
-    die "systemd is not running. In PowerShell run 'wsl --update' then 'wsl --shutdown', reopen Ubuntu and re-run."
-  fi
-  info "Installing Nix (Determinate installer, flakes enabled)"
-  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix |
-    sh -s -- install --no-confirm
-  load_nix
-  command -v nix >/dev/null 2>&1 || die "Nix installed but not on PATH; open a new shell and re-run."
+# --- 3. Nix --------------------------------------------------------------------
+nix_profile=/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+if [ ! -f "$nix_profile" ]; then
+  info "Installing Nix"
+  curl -sSfL https://install.determinate.systems/nix | sh -s -- install --no-confirm
 fi
+. "$nix_profile"
 
-# --- 4. The repo -----------------------------------------------------------
-# git may be missing on a new machine; Nix can provide it.
-if command -v git >/dev/null 2>&1 && git --version >/dev/null 2>&1; then
-  git() { command git "$@"; }
-else
-  git() { nix run nixpkgs#git -- "$@"; }
-fi
-
+# --- 4. The repo ---------------------------------------------------------------
+# A new machine may have no git; Nix can provide it.
+command -v git >/dev/null || git() { nix run nixpkgs#git -- "$@"; }
 if [ -d "$DOTFILES_DIR/.git" ]; then
-  info "Repo already at $DOTFILES_DIR"
-  if [ -z "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=no)" ]; then
-    git -C "$DOTFILES_DIR" pull --ff-only || warn "Could not fast-forward; using the checkout as it is."
-  else
-    warn "Repo has local changes; not pulling."
-  fi
+  git -C "$DOTFILES_DIR" pull --ff-only || info "Could not update the repo; using it as it is."
 else
-  [ -e "$DOTFILES_DIR" ] && die "$DOTFILES_DIR exists but is not a git repo."
-  info "Cloning $DOTFILES_REPO ($DOTFILES_BRANCH) to $DOTFILES_DIR"
-  git clone --branch "$DOTFILES_BRANCH" "$DOTFILES_REPO" "$DOTFILES_DIR"
+  git clone --branch "${DOTFILES_BRANCH:-main}" \
+    "${DOTFILES_REPO:-https://github.com/zbouslikhin/dotfiles.git}" "$DOTFILES_DIR"
+  # Fetch over HTTPS (works without keys), push over SSH.
+  git -C "$DOTFILES_DIR" remote set-url --push origin git@github.com:zbouslikhin/dotfiles.git
 fi
-# Push over SSH once a key is available (any name, not just id_*).
-if [ "$DOTFILES_REPO" = "$REPO_HTTPS" ] && grep -rqs "PRIVATE KEY" "$HOME/.ssh"; then
-  git -C "$DOTFILES_DIR" remote set-url origin "$REPO_SSH"
-fi
-
-hm_dir="$DOTFILES_DIR/config/home-manager"
-env_file="$hm_dir/machine.env"
 cat >"$env_file" <<EOF
-# Written by bootstrap.sh; per machine, not committed.
-DOTFILES_USER=$DOTFILES_USER
-DOTFILES_DIR=$DOTFILES_DIR
-DOTFILES_HOST=$DOTFILES_HOST
+DOTFILES_USER="$USER"
+DOTFILES_DIR="$DOTFILES_DIR"
+DOTFILES_HOST="$DOTFILES_HOST"
 EOF
-info "Wrote $env_file"
 
-# --- 5. Apply the Home Manager config ------------------------------------------
-# path: makes Nix include the gitignored machine.env.
-info "Switching to home-manager config '$DOTFILES_USER' ($DOTFILES_HOST)"
-nix run home-manager/master -- switch -b "hm-backup-$(date +%Y%m%d%H%M%S)" \
-  --flake "path:$hm_dir#$DOTFILES_USER"
+# --- 5. Apply the config -------------------------------------------------------
+# path: so Nix sees the gitignored machine.env.
+info "Applying the home-manager config"
+nix run home-manager/master -- switch -b "backup-$(date +%s)" \
+  --flake "path:$DOTFILES_DIR/config/home-manager#$USER"
 
-# --- 6. Make the Nix zsh the login shell ---------------------------------------
-zsh_path=""
-for p in "$HOME/.nix-profile/bin/zsh" "$HOME/.local/state/nix/profile/bin/zsh" \
-  "/etc/profiles/per-user/$DOTFILES_USER/bin/zsh"; do
-  [ -x "$p" ] && zsh_path="$p" && break
-done
-[ -n "$zsh_path" ] || die "zsh not found in the Nix profile after the switch."
-
-if ! grep -qxF "$zsh_path" /etc/shells; then
-  info "Adding $zsh_path to /etc/shells (needs sudo)"
-  echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
-fi
-
-if [ "$DOTFILES_HOST" = macos ]; then
-  current_shell=$(dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}' || true)
-else
-  current_shell=$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7 || true)
-fi
-if [ "$current_shell" != "$zsh_path" ]; then
-  info "Changing login shell to $zsh_path"
-  # Through sudo, so it reuses the approval from the start instead of asking again.
-  sudo chsh -s "$zsh_path" "$(id -un)" || warn "chsh failed; run: chsh -s $zsh_path"
-fi
+# --- 6. Nix zsh as the login shell ---------------------------------------------
+zsh_path="$HOME/.nix-profile/bin/zsh"
+grep -qx "$zsh_path" /etc/shells || echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+sudo chsh -s "$zsh_path" "$USER"
 
 info "Done. Open a new terminal. Update later with: nh home switch"
