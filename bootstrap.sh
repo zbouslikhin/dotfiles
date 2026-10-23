@@ -90,7 +90,8 @@ if [ ! -d "$mods/.git" ]; then
 fi
 [ -d "$mods/.git" ] && sh "$mods/install.sh"
 # File tree side pane (public mod): https://github.com/data-goblin/claude-code-filetree
-claude plugin marketplace add data-goblin/claude-code-filetree ||
+# HTTPS, not the owner/repo shorthand, which clones over SSH when a key exists.
+claude plugin marketplace add https://github.com/data-goblin/claude-code-filetree.git ||
   claude plugin marketplace update claude-code-filetree
 claude plugin install filetree@claude-code-filetree
 # Lets herdr show each Claude session's state (adds a hook to ~/.claude/settings.json).
