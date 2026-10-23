@@ -4,3 +4,5 @@
 [keys]
 # Ctrl+b is zellij's tmux mode, so herdr uses Ctrl+a.
 prefix = "ctrl+a"
+# New tab on Ctrl+t, like zellij's tab key; Ctrl+a c still works.
+new_tab = ["ctrl+t", "prefix+c"]
