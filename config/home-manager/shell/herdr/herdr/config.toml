@@ -16,3 +16,7 @@ split_horizontal = ["prefix+d", "prefix+minus"]  # new pane below (down)
 zoom = ["prefix+f", "prefix+z"]                  # fullscreen
 resize_mode = "prefix+shift+r"                   # frees r for "right"
 reload_config = "prefix+shift+c"                 # config
+
+[ui]
+# New tabs open straight away, like zellij (rename later with Ctrl+a Shift+t).
+prompt_new_tab_name = false
