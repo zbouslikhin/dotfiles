@@ -14,6 +14,8 @@
   programs.nh.enable = true;
   # path: so the gitignored machine.env is visible to the flake.
   home.sessionVariables.NH_FLAKE = "path:${hmDir}";
+  # Claude Code's own installer puts `claude` here (bootstrap.sh runs it).
+  home.sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
 
   programs.zsh = {
     enable = true;

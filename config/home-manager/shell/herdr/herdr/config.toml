@@ -1,0 +1,6 @@
+# herdr configuration. Only what differs from herdr's defaults; `herdr --default-config`
+# lists every option. herdr also writes here itself (e.g. onboarding), so expect changes.
+
+[keys]
+# Ctrl+b is zellij's tmux mode, so herdr uses Ctrl+a.
+prefix = "ctrl+a"

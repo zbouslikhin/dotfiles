@@ -6,6 +6,9 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     mac-app-util.url = "github:hraban/mac-app-util";
+    # Not in nixpkgs; its own flake builds it from source (no binary cache).
+    herdr.url = "github:herdrdev/herdr";
+    herdr.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -14,6 +17,7 @@
       nixpkgs,
       home-manager,
       mac-app-util,
+      herdr,
       ...
     }:
     let
@@ -35,6 +39,7 @@
           };
           extraSpecialArgs = {
             inherit wsl;
+            herdr = herdr.packages.${system}.default;
             # This flake inside the checkout, for out-of-store symlinks.
             hmDir = "${env.DOTFILES_DIR}/config/home-manager";
           };

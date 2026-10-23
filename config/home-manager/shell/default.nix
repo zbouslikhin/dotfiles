@@ -2,6 +2,7 @@
   imports = [
     ./carapace/config.nix
     ./zellij/config.nix
+    ./herdr/config.nix
     ./zsh/config.nix
     ./starship/config.nix
     ./zoxide/config.nix

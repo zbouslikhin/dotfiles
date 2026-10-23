@@ -73,6 +73,28 @@ nix run home-manager/master -- switch -b "backup-$(date +%s)" \
 # --- 6. Nix zsh as the login shell ---------------------------------------------
 zsh_path="$HOME/.nix-profile/bin/zsh"
 grep -qx "$zsh_path" /etc/shells || echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
-sudo chsh -s "$zsh_path" "$USER"
+[ "${SHELL:-}" = "$zsh_path" ] || sudo chsh -s "$zsh_path" "$USER"
+
+# --- 7. Claude Code and its mods -----------------------------------------------
+# Anthropic's installer, which keeps claude up to date by itself.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v claude >/dev/null; then
+  info "Installing Claude Code"
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+# The mods are in a private repo, so this needs a GitHub SSH key; skipped without one.
+mods="$HOME/.claude/benai-mods"
+if [ ! -d "$mods/.git" ]; then
+  GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone git@github.com:zbouslikhin/claude-mods.git "$mods" ||
+    info "Skipped the Claude Code mods: no access to the private claude-mods repo."
+fi
+[ -d "$mods/.git" ] && sh "$mods/install.sh"
+# File tree side pane (public mod): https://github.com/data-goblin/claude-code-filetree
+# HTTPS, not the owner/repo shorthand, which clones over SSH when a key exists.
+claude plugin marketplace add https://github.com/data-goblin/claude-code-filetree.git ||
+  claude plugin marketplace update claude-code-filetree
+claude plugin install filetree@claude-code-filetree
+# Lets herdr show each Claude session's state (adds a hook to ~/.claude/settings.json).
+herdr integration install claude
 
 info "Done. Open a new terminal. Update later with: nh home switch"
