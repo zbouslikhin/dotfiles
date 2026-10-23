@@ -19,6 +19,8 @@
       extraPackages = [
         pkgs.fd
         pkgs.nodejs
+        # nvim-treesitter (main branch) builds parsers with the tree-sitter CLI.
+        pkgs.tree-sitter
       ] ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.wl-clipboard ];
     };
   };

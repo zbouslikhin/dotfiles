@@ -1,2 +1,5 @@
 .DS_Store
 config/home-manager/machine.env
+# herdr keeps logs, sockets and sessions next to its config; only config.toml is ours.
+config/home-manager/shell/herdr/herdr/*
+!config/home-manager/shell/herdr/herdr/config.toml
