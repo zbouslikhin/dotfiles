@@ -6,3 +6,10 @@
 prefix = "ctrl+a"
 # New tab on Ctrl+t, like zellij's tab key; Ctrl+a c still works.
 new_tab = ["ctrl+t", "prefix+c"]
+
+# Same letters as zellij's pane mode; herdr's own keys still work.
+split_vertical = ["prefix+r", "prefix+v"]        # new pane to the right
+split_horizontal = ["prefix+d", "prefix+minus"]  # new pane below (down)
+zoom = ["prefix+f", "prefix+z"]                  # fullscreen
+resize_mode = "prefix+shift+r"                   # frees r for "right"
+reload_config = "prefix+shift+c"                 # config
