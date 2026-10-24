@@ -69,6 +69,8 @@ EOF
 info "Applying the home-manager config"
 nix run home-manager/master -- switch -b "backup-$(date +%s)" \
   --flake "path:$DOTFILES_DIR/config/home-manager#$USER"
+# Download the default language versions (Node LTS...) set in programming/mise.
+"$HOME/.nix-profile/bin/mise" install
 
 # --- 6. Nix zsh as the login shell ---------------------------------------------
 zsh_path="$HOME/.nix-profile/bin/zsh"

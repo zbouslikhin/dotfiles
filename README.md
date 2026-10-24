@@ -39,7 +39,13 @@ nh home switch
 gitignored `machine.env`; use it with `home-manager switch --flake` too. Neovim and zellij configs are
 symlinked straight into the clone, so their edits apply without a switch.
 
+## Languages
+
+[mise](https://mise.jdx.dev) manages language versions, and reads asdf's `.tool-versions` files too.
+Node LTS is the default everywhere (`programming/mise/config.nix`). In a project, pin a version with
+`mise use node@22` (or `python@3.13`, `go@latest`, `rust@stable`...), which writes `mise.toml`.
+
 ## TODO
 
 1. Add gcc compiler
-2. Replace asdf (Python setup is still manual: `asdf plugin add python && asdf install python latest`)
+2. Python packages and venvs with uv (mise installs Python itself)
