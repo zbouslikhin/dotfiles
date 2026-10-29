@@ -23,7 +23,8 @@ A Brave extension that saves tabs into an Obsidian vault through the
 ## 2. Brave: load the extension
 
 1. Go to `brave://extensions`, switch on **Developer mode**.
-2. **Load unpacked** → pick this folder.
+2. **Load unpacked** → pick `%LOCALAPPDATA%\chromium-extensions\tabs-to-obsidian` (WSL) or
+   `~/.local/share/chromium-extensions/tabs-to-obsidian`, where `nh home switch` puts it.
 3. Pin it from the puzzle-piece menu.
 
 ## 3. Connect them

@@ -45,12 +45,14 @@ symlinked straight into the clone, so their edits apply without a switch.
 Node LTS is the default everywhere (`programming/mise/config.nix`). In a project, pin a version with
 `mise use node@22` (or `python@3.13`, `go@latest`, `rust@stable`...), which writes `mise.toml`.
 
-## Brave extension
+## Chromium extensions
 
-`brave/tabs-to-obsidian` saves tabs into the Obsidian vault (see its README). It isn't installed by
-Home Manager: in `brave://extensions`, turn on Developer mode, **Load unpacked** and pick
-`\\wsl.localhost\Ubuntu\home\<you>\dotfiles\brave\tabs-to-obsidian` (or the folder in your clone on
-macOS/Linux). After editing it, click reload on its card.
+Unpacked Brave/Chrome extensions live in `config/home-manager/apps/chromium/extensions` (for now
+`tabs-to-obsidian`, see its README). `nh home switch` puts them at a fixed place: copied to
+`%LOCALAPPDATA%\chromium-extensions` on WSL, linked at `~/.local/share/chromium-extensions`
+elsewhere. Browsers won't install unpacked extensions on their own, so once per browser: in
+`brave://extensions`, turn on Developer mode, **Load unpacked** and pick the extension's folder
+there. After a change, switch (WSL) and click reload on its card.
 
 ## TODO
 
