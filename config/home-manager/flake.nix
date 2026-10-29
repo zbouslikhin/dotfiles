@@ -9,6 +9,9 @@
     # Not in nixpkgs; its own flake builds it from source (no binary cache).
     herdr.url = "github:herdrdev/herdr";
     herdr.inputs.nixpkgs.follows = "nixpkgs";
+    # Private, so over SSH; only fetched when dotfiles.streamdeck.enable is on (WSL).
+    streamdeck-workflow.url = "git+ssh://git@github.com/zbouslikhin/streamdeck-workflow";
+    streamdeck-workflow.flake = false;
   };
 
   outputs =
@@ -18,6 +21,7 @@
       home-manager,
       mac-app-util,
       herdr,
+      streamdeck-workflow,
       ...
     }:
     let
@@ -38,7 +42,7 @@
             config.allowUnfree = true;
           };
           extraSpecialArgs = {
-            inherit wsl;
+            inherit wsl streamdeck-workflow;
             herdr = herdr.packages.${system}.default;
             # This flake inside the checkout, for out-of-store symlinks.
             hmDir = "${env.DOTFILES_DIR}/config/home-manager";
@@ -51,6 +55,8 @@
                 homeDirectory = "${if nixpkgs.lib.hasSuffix "darwin" system then "/Users" else "/home"}/${env.DOTFILES_USER}";
               };
               programs.home-manager.enable = true;
+              # Optional per machine, on unless machine.env says DOTFILES_STREAMDECK="false".
+              dotfiles.streamdeck.enable = (env.DOTFILES_STREAMDECK or "true") != "false";
 
               imports = [
                 ./apps

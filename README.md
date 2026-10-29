@@ -53,6 +53,18 @@ Source: `config/home-manager/apps/chromium/extensions`. A switch puts them in
 Once per browser: `brave://extensions` → Developer mode → **Load unpacked** → pick the folder.
 After a change: switch (WSL only), then reload the extension.
 
+## Stream Deck
+
+On WSL, a switch installs Claude Agents, a Stream Deck plugin from the private
+[streamdeck-workflow](https://github.com/zbouslikhin/streamdeck-workflow) repo: one key per
+Claude agent running in herdr. It goes to `%APPDATA%\Elgato\StreamDeck\Plugins`, and Stream Deck
+is restarted when the plugin changed. Nothing happens if Stream Deck isn't installed, or if a
+development link is in its place.
+
+It's on by default. To turn it off on a machine, add `DOTFILES_STREAMDECK="false"` to
+`machine.env`; the private repo is then never fetched. To take a newer plugin:
+`nix flake update streamdeck-workflow --flake path:config/home-manager`, then switch.
+
 ## TODO
 
 1. Add gcc compiler

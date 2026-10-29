@@ -240,7 +240,8 @@
         "herdr": "herdr",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
-        "nixpkgs": "nixpkgs_5"
+        "nixpkgs": "nixpkgs_5",
+        "streamdeck-workflow": "streamdeck-workflow"
       }
     },
     "rust-overlay": {
@@ -262,6 +263,22 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "type": "github"
+      }
+    },
+    "streamdeck-workflow": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793295171,
+        "narHash": "sha256-HXob3gU0MHv1mTxclL5dwgkK4KWol+qOYMKLtCtPw/k=",
+        "ref": "refs/heads/main",
+        "rev": "d7481e1e52c83b5d41531b9e1b184fcda0637758",
+        "revCount": 3,
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/streamdeck-workflow"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/streamdeck-workflow"
       }
     },
     "systems": {
