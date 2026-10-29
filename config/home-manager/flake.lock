@@ -21,22 +21,6 @@
         "type": "github"
       }
     },
-    "claude-mods": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1793298215,
-        "narHash": "sha256-cNQ+huAU4J9+Z4uYcTMaAz+ey2HiKpTxb16mKUK1Rwk=",
-        "ref": "refs/heads/main",
-        "rev": "50bce2ddbb3da07a5af383c895f1241c81230cbf",
-        "revCount": 19,
-        "type": "git",
-        "url": "ssh://git@github.com/zbouslikhin/claude-mods"
-      },
-      "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/zbouslikhin/claude-mods"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -253,12 +237,12 @@
     },
     "root": {
       "inputs": {
-        "claude-mods": "claude-mods",
         "herdr": "herdr",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
         "nixpkgs": "nixpkgs_5",
-        "streamdeck-workflow": "streamdeck-workflow"
+        "streamdeck-workflow": "streamdeck-workflow",
+        "zaid-mods": "zaid-mods"
       }
     },
     "rust-overlay": {
@@ -362,6 +346,22 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "type": "github"
+      }
+    },
+    "zaid-mods": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793299688,
+        "narHash": "sha256-Gui32Mzzy+RQveH4L1DHIddb8ulmUeTabSeIvV4o4WQ=",
+        "ref": "refs/heads/main",
+        "rev": "375867f620d2d93a9019f158c4ff7a8cff1c0941",
+        "revCount": 21,
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/zaid-mods"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/zaid-mods"
       }
     }
   },

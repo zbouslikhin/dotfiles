@@ -84,7 +84,7 @@ if ! command -v claude >/dev/null; then
   info "Installing Claude Code"
   curl -fsSL https://claude.ai/install.sh | bash
 fi
-# The mods (the claude-mods flake input) are linked to ~/.claude/zaid-mods by the switch above,
+# The mods (the zaid-mods flake input) are linked to ~/.claude/zaid-mods by the switch above,
 # which installs them too once claude exists; on the first run it doesn't yet, so install them here.
 # install.sh copies switches.json out of the read-only store, and /mods has to write it.
 mods="$HOME/.claude/zaid-mods"
