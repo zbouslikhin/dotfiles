@@ -39,6 +39,11 @@ nh home switch
 gitignored `machine.env`; use it with `home-manager switch --flake` too. Neovim and zellij configs are
 symlinked straight into the clone, so their edits apply without a switch.
 
+The Claude Code mods are the private `claude-mods` repo, a submodule at
+`config/home-manager/programming/claude-code/benai-mods` linked to `~/.claude/benai-mods`. A switch
+fetches it if it's missing (needs a GitHub SSH key) and installs every mod. Commit mod changes inside
+the submodule, then commit the new submodule pointer here.
+
 ## Languages
 
 [mise](https://mise.jdx.dev) manages language versions, and reads asdf's `.tool-versions` files too.
