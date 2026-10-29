@@ -12,6 +12,10 @@
     # Private, so over SSH; only fetched when dotfiles.streamdeck.enable is on (WSL).
     streamdeck-workflow.url = "git+ssh://git@github.com/zbouslikhin/streamdeck-workflow";
     streamdeck-workflow.flake = false;
+    # Private too; only fetched when dotfiles.claudeMods.enable is on. The zaid-mods rename isn't
+    # on claude-mods' main yet: track main once it is.
+    claude-mods.url = "git+ssh://git@github.com/zbouslikhin/claude-mods?ref=rename-zaid-mods";
+    claude-mods.flake = false;
   };
 
   outputs =
@@ -22,6 +26,7 @@
       mac-app-util,
       herdr,
       streamdeck-workflow,
+      claude-mods,
       ...
     }:
     let
@@ -42,7 +47,7 @@
             config.allowUnfree = true;
           };
           extraSpecialArgs = {
-            inherit wsl streamdeck-workflow;
+            inherit wsl streamdeck-workflow claude-mods;
             herdr = herdr.packages.${system}.default;
             # This flake inside the checkout, for out-of-store symlinks.
             hmDir = "${env.DOTFILES_DIR}/config/home-manager";
@@ -57,6 +62,8 @@
               programs.home-manager.enable = true;
               # Optional per machine, on unless machine.env says DOTFILES_STREAMDECK="false".
               dotfiles.streamdeck.enable = (env.DOTFILES_STREAMDECK or "true") != "false";
+              # Same for the Claude Code mods: DOTFILES_CLAUDE_MODS="false" turns them off.
+              dotfiles.claudeMods.enable = (env.DOTFILES_CLAUDE_MODS or "true") != "false";
 
               imports = [
                 ./apps

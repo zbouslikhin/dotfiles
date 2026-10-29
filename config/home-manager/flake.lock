@@ -21,6 +21,23 @@
         "type": "github"
       }
     },
+    "claude-mods": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793295109,
+        "narHash": "sha256-cNQ+huAU4J9+Z4uYcTMaAz+ey2HiKpTxb16mKUK1Rwk=",
+        "ref": "rename-zaid-mods",
+        "rev": "51b5694d8eafe3dc70709adb92724eae676712f6",
+        "revCount": 18,
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/claude-mods"
+      },
+      "original": {
+        "ref": "rename-zaid-mods",
+        "type": "git",
+        "url": "ssh://git@github.com/zbouslikhin/claude-mods"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -237,6 +254,7 @@
     },
     "root": {
       "inputs": {
+        "claude-mods": "claude-mods",
         "herdr": "herdr",
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",

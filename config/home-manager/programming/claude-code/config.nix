@@ -1,31 +1,36 @@
 {
   config,
-  pkgs,
   lib,
-  hmDir,
+  claude-mods,
   ...
 }:
 
-# Claude Code mods (the private claude-mods repo), kept here as a git submodule.
-let
-  mods = "${hmDir}/programming/claude-code/zaid-mods";
-in
+# Claude Code mods: the private claude-mods repo, a flake input fetched over SSH. Change them in
+# their own clone and push, then `nix flake update claude-mods --flake path:config/home-manager`
+# and switch. Turn them off per machine with DOTFILES_CLAUDE_MODS="false" in machine.env (say,
+# without access to the repo); then it isn't fetched.
 {
-  # A symlink into the clone, so mod edits apply without a switch. The zaid-mods marketplace is
-  # registered at this path.
-  home.file.".claude/zaid-mods".source = config.lib.file.mkOutOfStoreSymlink mods;
+  options.dotfiles.claudeMods.enable = lib.mkOption {
+    type = lib.types.bool;
+    default = true;
+    description = "Install the Claude Code mods from the private claude-mods repo.";
+  };
 
-  home.activation.claudeMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    # The submodule is private, so this needs a GitHub SSH key; skipped without one.
-    if [ ! -f ${lib.escapeShellArg mods}/install.sh ]; then
-      GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o BatchMode=yes" \
-        run ${lib.getExe pkgs.git} -C ${lib.escapeShellArg mods}/.. submodule update --init zaid-mods ||
-        warnEcho "Skipped the Claude Code mods: no access to the private claude-mods repo."
-    fi
-    # Registers the marketplace and installs every mod; bootstrap.sh runs it once claude exists.
-    if [ -x "$HOME/.local/bin/claude" ] && [ -f "$HOME/.claude/zaid-mods/install.sh" ]; then
-      PATH="$HOME/.local/bin:$PATH" run sh "$HOME/.claude/zaid-mods/install.sh" ||
-        warnEcho "Couldn't install the Claude Code mods."
-    fi
-  '';
+  config = lib.mkIf config.dotfiles.claudeMods.enable {
+    # A fixed path to the store copy: the zaid-mods marketplace is registered here, so a newer
+    # copy only moves the link.
+    home.file.".claude/zaid-mods".source = "${claude-mods}";
+
+    home.activation.claudeMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      # Registers the marketplace and installs every mod; bootstrap.sh runs it once claude exists.
+      if [ -x "$HOME/.local/bin/claude" ]; then
+        PATH="$HOME/.local/bin:$PATH" run sh "$HOME/.claude/zaid-mods/install.sh" ||
+          warnEcho "Couldn't install the Claude Code mods."
+        # install.sh copies switches.json out of the read-only store; /mods has to write it.
+        if [ -f "$HOME/.claude/mods/switches.json" ]; then
+          run chmod u+w "$HOME/.claude/mods/switches.json"
+        fi
+      fi
+    '';
+  };
 }

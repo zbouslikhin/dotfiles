@@ -1,3 +1,0 @@
-[submodule "config/home-manager/programming/claude-code/zaid-mods"]
-	path = config/home-manager/programming/claude-code/zaid-mods
-	url = git@github.com:zbouslikhin/claude-mods.git
