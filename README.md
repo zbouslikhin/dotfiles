@@ -47,12 +47,11 @@ Node LTS is the default everywhere (`programming/mise/config.nix`). In a project
 
 ## Chromium extensions
 
-Unpacked Brave/Chrome extensions live in `config/home-manager/apps/chromium/extensions` (for now
-`tabs-to-obsidian`, see its README). `nh home switch` puts them at a fixed place: copied to
-`%LOCALAPPDATA%\chromium-extensions` on WSL, linked at `~/.local/share/chromium-extensions`
-elsewhere (Brave is installed on macOS and Ubuntu). Browsers won't install unpacked extensions on
-their own, so once per browser: in `brave://extensions`, turn on Developer mode, **Load unpacked**
-and pick the extension's folder there. After a change, switch (WSL) and click reload on its card.
+Source: `config/home-manager/apps/chromium/extensions`. A switch puts them in
+`%LOCALAPPDATA%\chromium-extensions` (WSL) or `~/.local/share/chromium-extensions`.
+
+Once per browser: `brave://extensions` → Developer mode → **Load unpacked** → pick the folder.
+After a change: switch (WSL only), then reload the extension.
 
 ## TODO
 
