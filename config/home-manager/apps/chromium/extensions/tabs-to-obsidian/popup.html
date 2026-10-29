@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <label>Folder
+    <input id="folder" list="folders" placeholder="vault root" autocomplete="off">
+    <datalist id="folders"></datalist>
+  </label>
+  <label>Note <small>(this tab is appended to it)</small>
+    <input id="note" placeholder="Inbox">
+  </label>
+  <label>Comment <small>(optional)</small>
+    <textarea id="comment" rows="2" placeholder="Why keep this?"></textarea>
+  </label>
+  <label class="check"><input type="checkbox" id="close"> Close tabs once saved</label>
+
+  <div class="buttons">
+    <button id="saveTab" class="primary">Save this tab</button>
+    <button id="saveWindow">Save all tabs in window</button>
+  </div>
+  <p id="status" role="status"></p>
+  <a href="#" id="options">Settings</a>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

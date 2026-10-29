@@ -45,6 +45,14 @@ symlinked straight into the clone, so their edits apply without a switch.
 Node LTS is the default everywhere (`programming/mise/config.nix`). In a project, pin a version with
 `mise use node@22` (or `python@3.13`, `go@latest`, `rust@stable`...), which writes `mise.toml`.
 
+## Chromium extensions
+
+Source: `config/home-manager/apps/chromium/extensions`. A switch puts them in
+`%LOCALAPPDATA%\chromium-extensions` (WSL) or `~/.local/share/chromium-extensions`.
+
+Once per browser: `brave://extensions` → Developer mode → **Load unpacked** → pick the folder.
+After a change: switch (WSL only), then reload the extension.
+
 ## TODO
 
 1. Add gcc compiler
