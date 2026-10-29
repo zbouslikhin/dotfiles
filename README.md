@@ -45,6 +45,13 @@ symlinked straight into the clone, so their edits apply without a switch.
 Node LTS is the default everywhere (`programming/mise/config.nix`). In a project, pin a version with
 `mise use node@22` (or `python@3.13`, `go@latest`, `rust@stable`...), which writes `mise.toml`.
 
+## Brave extension
+
+`brave/tabs-to-obsidian` saves tabs into the Obsidian vault (see its README). It isn't installed by
+Home Manager: in `brave://extensions`, turn on Developer mode, **Load unpacked** and pick
+`\\wsl.localhost\Ubuntu\home\<you>\dotfiles\brave\tabs-to-obsidian` (or the folder in your clone on
+macOS/Linux). After editing it, click reload on its card.
+
 ## TODO
 
 1. Add gcc compiler

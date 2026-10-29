@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tabs to Obsidian settings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="options">
+  <h1>Tabs to Obsidian</h1>
+  <label>Local REST API address
+    <input id="apiUrl" placeholder="https://obs.local:27124">
+  </label>
+  <label>API key <small>(Obsidian → Settings → Local REST API)</small>
+    <input id="apiKey" type="password" autocomplete="off">
+  </label>
+  <div class="buttons">
+    <button id="save" class="primary">Save and test</button>
+  </div>
+  <p id="status" role="status"></p>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
