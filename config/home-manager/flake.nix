@@ -12,9 +12,8 @@
     # Private, so over SSH; only fetched when dotfiles.streamdeck.enable is on (WSL).
     streamdeck-workflow.url = "git+ssh://git@github.com/zbouslikhin/streamdeck-workflow";
     streamdeck-workflow.flake = false;
-    # Private too; only fetched when dotfiles.claudeMods.enable is on. The zaid-mods rename isn't
-    # on claude-mods' main yet: track main once it is.
-    claude-mods.url = "git+ssh://git@github.com/zbouslikhin/claude-mods?ref=rename-zaid-mods";
+    # Private too; only fetched when dotfiles.claudeMods.enable is on.
+    claude-mods.url = "git+ssh://git@github.com/zbouslikhin/claude-mods";
     claude-mods.flake = false;
   };
 
