@@ -24,16 +24,15 @@
     "claude-mods": {
       "flake": false,
       "locked": {
-        "lastModified": 1793295109,
+        "lastModified": 1793298215,
         "narHash": "sha256-cNQ+huAU4J9+Z4uYcTMaAz+ey2HiKpTxb16mKUK1Rwk=",
-        "ref": "rename-zaid-mods",
-        "rev": "51b5694d8eafe3dc70709adb92724eae676712f6",
-        "revCount": 18,
+        "ref": "refs/heads/main",
+        "rev": "50bce2ddbb3da07a5af383c895f1241c81230cbf",
+        "revCount": 19,
         "type": "git",
         "url": "ssh://git@github.com/zbouslikhin/claude-mods"
       },
       "original": {
-        "ref": "rename-zaid-mods",
         "type": "git",
         "url": "ssh://git@github.com/zbouslikhin/claude-mods"
       }
