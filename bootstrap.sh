@@ -84,14 +84,10 @@ if ! command -v claude >/dev/null; then
   info "Installing Claude Code"
   curl -fsSL https://claude.ai/install.sh | bash
 fi
-# The mods (the zaid-mods flake input) are linked to ~/.claude/zaid-mods by the switch above,
-# which installs them too once claude exists; on the first run it doesn't yet, so install them here.
-# install.sh copies switches.json out of the read-only store, and /mods has to write it.
+# The switch above clones the mods to ~/.claude/zaid-mods and installs them once claude exists;
+# on the first run it doesn't yet, so install them here.
 mods="$HOME/.claude/zaid-mods"
-if [ -f "$mods/install.sh" ]; then
-  sh "$mods/install.sh"
-  chmod u+w "$HOME/.claude/mods/switches.json" 2>/dev/null || true
-fi
+[ -f "$mods/install.sh" ] && sh "$mods/install.sh"
 # File tree side pane (public mod): https://github.com/data-goblin/claude-code-filetree
 # HTTPS, not the owner/repo shorthand, which clones over SSH when a key exists.
 claude plugin marketplace add https://github.com/data-goblin/claude-code-filetree.git ||
