@@ -12,9 +12,6 @@
     # Private, so over SSH; only fetched when dotfiles.streamdeck.enable is on (WSL).
     streamdeck-workflow.url = "git+ssh://git@github.com/zbouslikhin/streamdeck-workflow";
     streamdeck-workflow.flake = false;
-    # Private too; only fetched when dotfiles.claudeMods.enable is on.
-    zaid-mods.url = "git+ssh://git@github.com/zbouslikhin/zaid-mods";
-    zaid-mods.flake = false;
   };
 
   outputs =
@@ -25,7 +22,6 @@
       mac-app-util,
       herdr,
       streamdeck-workflow,
-      zaid-mods,
       ...
     }:
     let
@@ -46,7 +42,7 @@
             config.allowUnfree = true;
           };
           extraSpecialArgs = {
-            inherit wsl streamdeck-workflow zaid-mods;
+            inherit wsl streamdeck-workflow;
             herdr = herdr.packages.${system}.default;
             # This flake inside the checkout, for out-of-store symlinks.
             hmDir = "${env.DOTFILES_DIR}/config/home-manager";

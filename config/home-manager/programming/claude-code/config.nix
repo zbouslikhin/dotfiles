@@ -1,14 +1,13 @@
 {
   config,
+  pkgs,
   lib,
-  zaid-mods,
   ...
 }:
 
-# Claude Code mods: the private zaid-mods repo, a flake input fetched over SSH. Change them in
-# their own clone and push, then `nix flake update zaid-mods --flake path:config/home-manager`
-# and switch. Turn them off per machine with DOTFILES_CLAUDE_MODS="false" in machine.env (say,
-# without access to the repo); then it isn't fetched.
+# Claude Code mods: the private zaid-mods repo, cloned to ~/.claude/zaid-mods over SSH and pulled to
+# the latest main on every switch; never pinned. Turn them off per machine with
+# DOTFILES_CLAUDE_MODS="false" in machine.env (say, without access to the repo).
 {
   options.dotfiles.claudeMods.enable = lib.mkOption {
     type = lib.types.bool;
@@ -17,16 +16,26 @@
   };
 
   config = lib.mkIf config.dotfiles.claudeMods.enable {
-    # A fixed path to the store copy: the zaid-mods marketplace is registered here, so a newer
-    # copy only moves the link.
-    home.file.".claude/zaid-mods".source = "${zaid-mods}";
-
     home.activation.claudeMods = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      # Registers the marketplace and installs every mod; bootstrap.sh runs it once claude exists.
-      if [ -x "$HOME/.local/bin/claude" ]; then
-        PATH="$HOME/.local/bin:$PATH" run sh "$HOME/.claude/zaid-mods/install.sh" ||
+      mods="$HOME/.claude/zaid-mods"
+      git=${lib.getExe pkgs.git}
+      export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -o BatchMode=yes"
+      if [ -d "$mods/.git" ]; then
+        run $git -C "$mods" pull --ff-only --quiet ||
+          warnEcho "Couldn't pull the latest Claude Code mods into $mods; kept the version there."
+      elif [ ! -e "$mods" ]; then
+        run $git clone --quiet git@github.com:zbouslikhin/zaid-mods.git "$mods" ||
+          warnEcho "Skipped the Claude Code mods: no access to the private zaid-mods repo."
+      else
+        warnEcho "$mods isn't a git clone; move it away to get the Claude Code mods."
+      fi
+      unset GIT_SSH_COMMAND
+      # Registers the marketplace and installs or updates every mod; bootstrap.sh runs it once
+      # claude exists.
+      if [ -x "$HOME/.local/bin/claude" ] && [ -f "$mods/install.sh" ]; then
+        PATH="$HOME/.local/bin:$PATH" run sh "$mods/install.sh" ||
           warnEcho "Couldn't install the Claude Code mods."
-        # install.sh copies switches.json out of the read-only store; /mods has to write it.
+        # An earlier switch copied switches.json out of the read-only store; /mods has to write it.
         if [ -f "$HOME/.claude/mods/switches.json" ]; then
           run chmod u+w "$HOME/.claude/mods/switches.json"
         fi
