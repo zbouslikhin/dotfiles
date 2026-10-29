@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Tabs to Obsidian",
+  "version": "1.0.0",
+  "description": "Save the current tab, or every tab in the window, into an Obsidian vault through the Local REST API plugin.",
+  "permissions": ["tabs", "storage", "activeTab", "scripting"],
+  "host_permissions": ["https://obs.local/*", "http://obs.local/*"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_title": "Save to Obsidian",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Alt+Shift+O" },
+      "description": "Open the Save to Obsidian popup"
+    }
+  }
+}
