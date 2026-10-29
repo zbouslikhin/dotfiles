@@ -39,6 +39,12 @@ nh home switch
 gitignored `machine.env`; use it with `home-manager switch --flake` too. Neovim and zellij configs are
 symlinked straight into the clone, so their edits apply without a switch.
 
+The Claude Code mods are the private `claude-mods` repo, a flake input fetched over SSH (needs a
+GitHub SSH key) and linked to `~/.claude/zaid-mods`; a switch installs every mod. Change the mods in
+their own clone and push, then take them with `nix flake update claude-mods --flake
+path:config/home-manager` and switch. Without access to the repo, add `DOTFILES_CLAUDE_MODS="false"`
+to `machine.env`; it is then never fetched.
+
 ## Languages
 
 [mise](https://mise.jdx.dev) manages language versions, and reads asdf's `.tool-versions` files too.

@@ -84,13 +84,14 @@ if ! command -v claude >/dev/null; then
   info "Installing Claude Code"
   curl -fsSL https://claude.ai/install.sh | bash
 fi
-# The mods are in a private repo, so this needs a GitHub SSH key; skipped without one.
-mods="$HOME/.claude/benai-mods"
-if [ ! -d "$mods/.git" ]; then
-  GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone git@github.com:zbouslikhin/claude-mods.git "$mods" ||
-    info "Skipped the Claude Code mods: no access to the private claude-mods repo."
+# The mods (the claude-mods flake input) are linked to ~/.claude/zaid-mods by the switch above,
+# which installs them too once claude exists; on the first run it doesn't yet, so install them here.
+# install.sh copies switches.json out of the read-only store, and /mods has to write it.
+mods="$HOME/.claude/zaid-mods"
+if [ -f "$mods/install.sh" ]; then
+  sh "$mods/install.sh"
+  chmod u+w "$HOME/.claude/mods/switches.json" 2>/dev/null || true
 fi
-[ -d "$mods/.git" ] && sh "$mods/install.sh"
 # File tree side pane (public mod): https://github.com/data-goblin/claude-code-filetree
 # HTTPS, not the owner/repo shorthand, which clones over SSH when a key exists.
 claude plugin marketplace add https://github.com/data-goblin/claude-code-filetree.git ||
