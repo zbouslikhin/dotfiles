@@ -84,9 +84,9 @@ if ! command -v claude >/dev/null; then
   info "Installing Claude Code"
   curl -fsSL https://claude.ai/install.sh | bash
 fi
-# The mods are a submodule linked to ~/.claude/benai-mods by the switch above, which installs
+# The mods are a submodule linked to ~/.claude/zaid-mods by the switch above, which installs
 # them too once claude exists; on the first run it doesn't yet, so install them here.
-mods="$HOME/.claude/benai-mods"
+mods="$HOME/.claude/zaid-mods"
 [ -f "$mods/install.sh" ] && sh "$mods/install.sh"
 # File tree side pane (public mod): https://github.com/data-goblin/claude-code-filetree
 # HTTPS, not the owner/repo shorthand, which clones over SSH when a key exists.
