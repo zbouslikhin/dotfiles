@@ -351,11 +351,11 @@
     "zaid-mods": {
       "flake": false,
       "locked": {
-        "lastModified": 1793299688,
-        "narHash": "sha256-Gui32Mzzy+RQveH4L1DHIddb8ulmUeTabSeIvV4o4WQ=",
+        "lastModified": 1794439620,
+        "narHash": "sha256-DBmDFmPPul9q6ryRjbtd/HCrNWpITQs51pidklPyV0Y=",
         "ref": "refs/heads/main",
-        "rev": "375867f620d2d93a9019f158c4ff7a8cff1c0941",
-        "revCount": 21,
+        "rev": "b5903c57a0b4081b6f336d7139ecbad2ed3c7728",
+        "revCount": 45,
         "type": "git",
         "url": "ssh://git@github.com/zbouslikhin/zaid-mods"
       },
